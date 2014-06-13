@@ -4,11 +4,11 @@ test('brightcove', function() {
 
   var initializing = bright.init();
 
-  ok( initializing, 'starts loading' );
+  ok(initializing, 'starts loading');
 
   stop();
   setTimeout(function() {
-    ok( typeof window.brightcove !== 'undefined', 'has been loaded' );
+    ok(typeof window.brightcove !== 'undefined', 'has been loaded');
     start();
   }, 1000);
 });
