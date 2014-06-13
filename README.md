@@ -1,6 +1,6 @@
 # Bright
 
-easy brightcove abstraction
+easy brightcove abstraction for IE8+
 
 ## About
 

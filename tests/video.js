@@ -1,17 +1,27 @@
+/* global video, test, expect, ok, stop, start */
+
 module('Initialization');
 
-test('brightcove', function() {
+test('player', function() {
   expect(3);
 
-  ok(bright.init(), 'starts initializing');
+  var player1 = video({
+    element: '#player1',
+    playerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
+  });
+  var player2 = video({
+    element: '#player2',
+    playerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
+  });
 
+  ok(player1.element.innerHTML, 'appended html to player1');
+  ok(player2.element.innerHTML, 'appended html to player2');
   stop();
-  setTimeout(function() {
-    ok(bright.isInit(), 'has initialized');
-    ok(!bright.init(), 'doesn’t initialize twice');
-    start();
-  }, 1000);
 
+  setTimeout(function() {
+    ok(!!window.brightcove.__bright__, 'loaded brightcove');
+    start();
+  },2000);
 });
 
 // module('Methods');
