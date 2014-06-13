@@ -1,16 +1,17 @@
 module('Initialization');
+
 test('brightcove', function() {
-  expect(2);
+  expect(3);
 
-  var initializing = bright.init();
-
-  ok(initializing, 'starts loading');
+  ok(bright.init(), 'starts initializing');
 
   stop();
   setTimeout(function() {
-    ok(typeof window.brightcove !== 'undefined', 'has been loaded');
+    ok(bright.isInit(), 'has initialized');
+    ok(!bright.init(), 'doesn’t initialize twice');
     start();
   }, 1000);
+
 });
 
 // module('Methods');
