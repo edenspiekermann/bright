@@ -1,0 +1,24 @@
+{
+  "name": "bright",
+  "version": "0.0.1",
+  "description": "easy brightcove abstraction",
+  "main": "src/bright.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "start": "watchify src/bright.js -o dist/bright.standalone.js --standalone bright",
+    "build": "npm run build-common && npm run build-common-min && npm run build-standalone && npm run build-standalone-min",
+    "build-common": "browserify src/bright.js -o dist/bright.js",
+    "build-common-min": "browserify src/bright.js -o dist/bright.min.js",
+    "build-standalone": "browserify src/bright.js -o dist/bright.standalone.js --standalone bright",
+    "build-standalone-min": "browserify src/bright.js -o dist/bright.standalone.min.js --standalone bright",
+    "test": "open 'http://localhost:8000/tests/index.html' && python -m SimpleHTTPServer"
+  },
+  "author": "edenspiekermann",
+  "license": "MIT",
+  "devDependencies": {
+    "browserify": "^4.1.10",
+    "watchify": "^0.10.2"
+  }
+}
