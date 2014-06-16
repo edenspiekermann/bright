@@ -2,8 +2,8 @@
 
 module('Initialization');
 
-test('video', function() {
-  expect(4);
+test('VideoService', function() {
+  expect(8);
 
   ok(!document.getElementById('player1').innerHTML, 'player1 innerHTML is empty');
   ok(!document.getElementById('player2').innerHTML, 'player2 innerHTML is empty');
@@ -17,13 +17,25 @@ test('video', function() {
     playerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
   });
 
-  ok(player1.element.innerHTML, 'appended html to player1');
-  ok(player2.element.innerHTML, 'appended html to player2');
+  ok(player1.element.id === 'player1', 'created element');
+  ok(player2.element.id === 'player2', 'created element');
+
+  ok(player1.element.innerHTML, 'created html for player1');
+  ok(player2.element.innerHTML, 'created html for player2');
+
+  player1.on('init', function() {
+    ok(true, 'initialized player1');
+    start();
+  });
+  player2.on('init', function() {
+    ok(true, 'initialized player2');
+    start();
+  });
+  stop(2);
 });
 
-module('Methods and Events');
-test('Player', function() {
-  expect(1);
+test('Video', function() {
+  expect(3);
 
   var player = video({
     element: '#player1',
@@ -32,31 +44,31 @@ test('Player', function() {
 
   player.on('loadstart', function() {
     ok(true, 'can load a video');
+    start();
   });
 
   player.on('play', function() {
     ok(true, 'can play a video');
+    start();
   });
 
   player.on('pause', function() {
     ok(true, 'can pause a video');
+    start();
   });
 
   player.on('ended', function() {
     ok(true, 'emit ended event after video playback');
   });
 
+  stop();
   player.load(1754276221001);
-  stop();
 
+  stop();
   player.play();
-  stop();
 
+  stop();
   player.pause();
-  stop();
-
-  player.play();
-  stop();
 });
 
 // module('Readable Player Properties');

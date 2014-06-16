@@ -1,19 +1,22 @@
 var assign = require('lodash-node/modern/objects/assign');
-var emitter = require('component-emitter');
+var bind = require('lodash-node/modern/functions/bind');
 var videoService = require('./brightcove');
+var emitter = require('component-emitter');
 
-function video(options) {
-  if (!videoService.isLoading && !videoService.hasLoaded) videoService.load();
-  var instance = assign(Object.create(emitter(videoPrototype)), options);
-  instance.init();
-  return instance;
+function playerFactory(options) {
+  var player = Object.create(playerPrototype);
+  player = emitter(player);
+  player.init(options);
+  return player;
 }
 
-var videoPrototype = {
-  init: function() {
-    this.element = document.querySelector(this.element);
-    this.element.innerHTML = '';
-    this.element.appendChild(videoService.createHTML());
+var playerPrototype = {
+  init: function(options) {
+    this.options = assign({}, options);
+    this.element = document.querySelector(this.options.element);
+    delete this.options.element;
+    videoService.init(this);
+    return this;
   },
   load: function() {
     this.emit('loadstart');
@@ -26,4 +29,4 @@ var videoPrototype = {
   }
 };
 
-module.exports = video;
+module.exports = playerFactory;

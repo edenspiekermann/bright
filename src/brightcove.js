@@ -1,38 +1,45 @@
+var assign = require('lodash-node/modern/objects/assign');
+
 var brightcove = {
 
   defaults: {
     isVid: true,
     isUI: true,
     includeAPI: true,
-    templateLoadHandler: 'brightcove.__bright__.templateLoadHandler',
-    templateReadyHandler: 'brightcove.__bright__.templateReadyHandler'
+    templateReadyHandler: 'brightcove.__bright__.templateReadyHandler',
   },
 
-  load: function() {
+  init: function(instance) {
+    brightcove.createHTML(instance);
+    if (brightcove.isLoading || brightcove.hasLoaded) return;
     brightcove.isLoading = true;
     var script = document.createElement('script');
     script.src = 'http://admin.brightcove.com/js/BrightcoveExperiences.js';
-    script.onload = brightcove.init;
+    script.onload = function() {
+      brightcove.load(instance);
+    };
     document.body.appendChild(script);
   },
 
-  init: function() {
-    brightcove.hasLoaded = true;
-    brightcove.isLoading = false;
+  load: function(instance) {
     window.brightcove.__bright__ = {
-      templateReadyHandler: readyHandler,
-      templateLoadHandler: loadHandler
+      templateReadyHandler: function() {
+        brightcove.hasLoaded = true;
+        brightcove.isLoading = false;
+        instance.emit('init');
+      }
     };
     window.brightcove.createExperiences();
   },
 
-  createHTML: function() {
+  createHTML: function(instance) {
     var object = document.createElement('object');
     object.className = "BrightcoveExperience";
-    for (var option in brightcove.defaults) {
-      object.appendChild(createParam(option, brightcove.defaults[option]));
+    var options = assign(brightcove.defaults, instance.options);
+    for (var param in options) {
+      object.appendChild(createParam(param, options[param]));
     }
-    return object;
+    instance.element.appendChild(object);
 
     function createParam(name, value) {
       var param = document.createElement('param');
@@ -42,13 +49,5 @@ var brightcove = {
     }
   }
 };
-
-function readyHandler() {
-  console.log('readyHandler');
-}
-
-function loadHandler() {
-  console.log('loadHandler');
-}
 
 module.exports = brightcove;

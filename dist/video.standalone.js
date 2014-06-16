@@ -1052,41 +1052,48 @@ function noop() {
 module.exports = noop;
 
 },{}],20:[function(_dereq_,module,exports){
+var assign = _dereq_('lodash-node/modern/objects/assign');
+
 var brightcove = {
 
   defaults: {
     isVid: true,
     isUI: true,
     includeAPI: true,
-    templateLoadHandler: 'brightcove.__bright__.templateLoadHandler',
-    templateReadyHandler: 'brightcove.__bright__.templateReadyHandler'
+    templateReadyHandler: 'brightcove.__bright__.templateReadyHandler',
   },
 
-  load: function() {
+  init: function(instance) {
+    brightcove.createHTML(instance);
+    if (brightcove.isLoading || brightcove.hasLoaded) return;
     brightcove.isLoading = true;
     var script = document.createElement('script');
     script.src = 'http://admin.brightcove.com/js/BrightcoveExperiences.js';
-    script.onload = brightcove.init;
+    script.onload = function() {
+      brightcove.load(instance);
+    };
     document.body.appendChild(script);
   },
 
-  init: function() {
-    brightcove.hasLoaded = true;
-    brightcove.isLoading = false;
+  load: function(instance) {
     window.brightcove.__bright__ = {
-      templateReadyHandler: readyHandler,
-      templateLoadHandler: loadHandler
+      templateReadyHandler: function() {
+        brightcove.hasLoaded = true;
+        brightcove.isLoading = false;
+        instance.emit('init');
+      }
     };
     window.brightcove.createExperiences();
   },
 
-  createHTML: function() {
+  createHTML: function(instance) {
     var object = document.createElement('object');
     object.className = "BrightcoveExperience";
-    for (var option in brightcove.defaults) {
-      object.appendChild(createParam(option, brightcove.defaults[option]));
+    var options = assign(brightcove.defaults, instance.options);
+    for (var param in options) {
+      object.appendChild(createParam(param, options[param]));
     }
-    return object;
+    instance.element.appendChild(object);
 
     function createParam(name, value) {
       var param = document.createElement('param');
@@ -1097,33 +1104,28 @@ var brightcove = {
   }
 };
 
-function readyHandler() {
-  console.log('readyHandler');
-}
-
-function loadHandler() {
-  console.log('loadHandler');
-}
-
 module.exports = brightcove;
 
-},{}],21:[function(_dereq_,module,exports){
+},{"lodash-node/modern/objects/assign":13}],21:[function(_dereq_,module,exports){
 var assign = _dereq_('lodash-node/modern/objects/assign');
-var emitter = _dereq_('component-emitter');
+var bind = _dereq_('lodash-node/modern/functions/bind');
 var videoService = _dereq_('./brightcove');
+var emitter = _dereq_('component-emitter');
 
-function video(options) {
-  if (!videoService.isLoading && !videoService.hasLoaded) videoService.load();
-  var instance = assign(Object.create(emitter(videoPrototype)), options);
-  instance.init();
-  return instance;
+function playerFactory(options) {
+  var player = Object.create(playerPrototype);
+  player = emitter(player);
+  player.init(options);
+  return player;
 }
 
-var videoPrototype = {
-  init: function() {
-    this.element = document.querySelector(this.element);
-    this.element.innerHTML = '';
-    this.element.appendChild(videoService.createHTML());
+var playerPrototype = {
+  init: function(options) {
+    this.options = assign({}, options);
+    this.element = document.querySelector(this.options.element);
+    delete this.options.element;
+    videoService.init(this);
+    return this;
   },
   load: function() {
     this.emit('loadstart');
@@ -1136,8 +1138,8 @@ var videoPrototype = {
   }
 };
 
-module.exports = video;
+module.exports = playerFactory;
 
-},{"./brightcove":20,"component-emitter":1,"lodash-node/modern/objects/assign":13}]},{},[21])
+},{"./brightcove":20,"component-emitter":1,"lodash-node/modern/functions/bind":2,"lodash-node/modern/objects/assign":13}]},{},[21])
 (21)
 });
