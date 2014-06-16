@@ -10,15 +10,16 @@
     "start": "watchify src/video.js -o dist/video.standalone.js --standalone video",
     "build": "npm run build-common && npm run build-common-min && npm run build-standalone && npm run build-standalone-min",
     "build-common": "browserify src/video.js -o dist/video.js",
-    "build-common-min": "browserify src/video.js -o dist/video.min.js",
+    "build-common-min": "browserify src/video.js | uglifyjs -mc > dist/video.min.js",
     "build-standalone": "browserify src/video.js -o dist/video.standalone.js --standalone video",
-    "build-standalone-min": "browserify src/video.js -o dist/video.standalone.min.js --standalone video",
+    "build-standalone-min": "browserify src/video.js --standalone video | uglifyjs -mc > dist/video.standalone.min.js",
     "test": "open 'http://localhost:8000/tests/index.html' && python -m SimpleHTTPServer"
   },
   "author": "edenspiekermann",
   "license": "MIT",
   "devDependencies": {
     "browserify": "^4.1.10",
+    "uglify-js": "^2.4.14",
     "watchify": "^0.10.2"
   },
   "dependencies": {
