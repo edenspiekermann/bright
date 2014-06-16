@@ -1,45 +1,43 @@
 var assign = require('lodash-node/modern/objects/assign');
+var bind = require('lodash-node/modern/functions/bind');
 
-var brightcove = {
+var brightcovePrototype = {
 
   defaults: {
     isVid: true,
     isUI: true,
     includeAPI: true,
-    templateReadyHandler: 'brightcove.__bright__.templateReadyHandler',
+    wmode: 'transparent',
+    bgcolor: 'transparent',
+    templateLoadHandler: 'brightcove.__bright__.templateLoadHandler',
+    templateReadyHandler: 'brightcove.__bright__.templateReadyHandler'
   },
 
-  init: function(instance) {
-    brightcove.createHTML(instance);
-    if (brightcove.isLoading || brightcove.hasLoaded) return;
-    brightcove.isLoading = true;
+  init: function(options, templateReady, templateLoaded) {
+    this._createHTML(options, templateReady);
+    if (brightcovePrototype.isLoading || brightcovePrototype.hasLoaded) return;
+    brightcovePrototype.isLoading = true;
     var script = document.createElement('script');
     script.src = 'http://admin.brightcove.com/js/BrightcoveExperiences.js';
-    script.onload = function() {
-      brightcove.load(instance);
-    };
+    script.onload = bind(this._init, this, templateLoaded);
     document.body.appendChild(script);
   },
 
-  load: function(instance) {
-    window.brightcove.__bright__ = {
-      templateReadyHandler: function() {
-        brightcove.hasLoaded = true;
-        brightcove.isLoading = false;
-        instance.emit('init');
-      }
-    };
-    window.brightcove.createExperiences();
+  load: function(videoId, callback) {
+    brightcove.player.cueVideoByID(videoId);
+    callback();
   },
 
-  createHTML: function(instance) {
+  _createHTML: function(options, templateReady) {
     var object = document.createElement('object');
     object.className = "BrightcoveExperience";
-    var options = assign(brightcove.defaults, instance.options);
+    options = assign(this.defaults, options);
     for (var param in options) {
       object.appendChild(createParam(param, options[param]));
     }
-    instance.element.appendChild(object);
+    setTimeout(function() {
+      templateReady(object);
+    });
 
     function createParam(name, value) {
       var param = document.createElement('param');
@@ -47,7 +45,26 @@ var brightcove = {
       param.value = value;
       return param;
     }
+  },
+
+  _init: function(templateLoaded) {
+    window.brightcove.__bright__ = {};
+    window.brightcove.__bright__.templateLoadHandler = bind(function(experienceID) {
+      this.api = window.brightcove.api.getExperience(experienceID);
+      this.player = this.api.getModule(window.brightcove.api.modules.APIModules.VIDEO_PLAYER);
+    }, this);
+    window.brightcove.__bright__.templateReadyHandler = function() {
+      brightcovePrototype.hasLoaded = true;
+      brightcovePrototype.isLoading = false;
+      templateLoaded();
+    };
+    window.brightcove.createExperiences();
   }
+
 };
 
-module.exports = brightcove;
+function brightcoveFactory() {
+  return Object.create(brightcovePrototype);
+}
+
+module.exports = brightcoveFactory;
