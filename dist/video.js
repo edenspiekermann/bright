@@ -900,21 +900,29 @@ var brightcove = {
     brightcove.isLoading = true;
     var script = document.createElement('script');
     script.src = 'http://admin.brightcove.com/js/BrightcoveExperiences.js';
-    script.onload = function() {
-      brightcove.hasLoaded = true;
-    };
+    script.onload = brightcove.init;
     document.body.appendChild(script);
+  },
+
+  init: function() {
+    brightcove.hasLoaded = true;
+    brightcove.isLoading = false;
+    window.brightcove.__bright__ = {
+      templateReadyHandler: readyHandler,
+      templateLoadHandler: loadHandler
+    };
+    window.brightcove.createExperiences();
   },
 
   createHTML: function() {
     var object = document.createElement('object');
     object.className = "BrightcoveExperience";
     for (var option in brightcove.defaults) {
-      object.appendChild(createParamElement(option, brightcove.defaults[option]));
+      object.appendChild(createParam(option, brightcove.defaults[option]));
     }
     return object;
 
-    function createParamElement(name, value) {
+    function createParam(name, value) {
       var param = document.createElement('param');
       param.name = name;
       param.value = value;
@@ -923,11 +931,19 @@ var brightcove = {
   }
 };
 
+function readyHandler() {
+  console.log('readyHandler');
+}
+
+function loadHandler() {
+  console.log('loadHandler');
+}
+
 module.exports = brightcove;
 
 },{}],20:[function(require,module,exports){
 var assign = require('lodash-node/modern/objects/assign');
-var brightcove = require('./brightcove');
+var videoService = require('./brightcove');
 
 var videoPrototype = {
   init: function() {

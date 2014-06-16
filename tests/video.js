@@ -2,8 +2,11 @@
 
 module('Initialization');
 
-test('player', function() {
-  expect(3);
+test('video', function() {
+  expect(4);
+
+  ok(!document.getElementById('player1').innerHTML, 'player1 innerHTML is empty');
+  ok(!document.getElementById('player2').innerHTML, 'player2 innerHTML is empty');
 
   var player1 = video({
     element: '#player1',
@@ -16,18 +19,45 @@ test('player', function() {
 
   ok(player1.element.innerHTML, 'appended html to player1');
   ok(player2.element.innerHTML, 'appended html to player2');
-  stop();
-
-  setTimeout(function() {
-    ok(!!window.brightcove.__bright__, 'loaded brightcove');
-    start();
-  },2000);
 });
 
-// module('Methods');
-// test('Player can load a video');
-// test('Player can play a video');
-// test('Player can pause a video');
+module('Methods and Events');
+test('Player', function() {
+  expect(1);
+
+  var player = video({
+    element: '#player1',
+    playerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
+  });
+
+  player.on('loadstart', function() {
+    ok(true, 'can load a video');
+  });
+
+  player.on('play', function() {
+    ok(true, 'can play a video');
+  });
+
+  player.on('pause', function() {
+    ok(true, 'can pause a video');
+  });
+
+  player.on('ended', function() {
+    ok(true, 'emit ended event after video playback');
+  });
+
+  player.load(1754276221001);
+  stop();
+
+  player.play();
+  stop();
+
+  player.pause();
+  stop();
+
+  player.play();
+  stop();
+});
 
 // module('Readable Player Properties');
 // test('Player has a readable volume attribute');
