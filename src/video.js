@@ -2,33 +2,29 @@ var assign = require('lodash-node/modern/objects/assign');
 var bind = require('lodash-node/modern/functions/bind');
 var emitter = require('component-emitter');
 
-var videoService = require('./brightcove');
+var defaultVideoService = require('./brightcove');
 
 var playerPrototype = {
 
-  init: function(options) {
+  init: function(options, videoService) {
     this.element = document.querySelector(options.element);
     delete options.element;
     this.options = assign({}, options);
 
-    this._service = videoService();
-    this._service.init(options, bind(this.emit, this, 'templateReady'), bind(this.emit, this, 'templateLoaded'));
+    this._service = (videoService) ? videoService() : defaultVideoService();
+    this._service.init(this.element, options, bind(this.emit, this));
   },
 
   load: function(videoId) {
-    if (this._service.player) {
-      this._service.load(videoId, bind(this.emit, this, 'loadstart'));
-      return;
-    }
-    this.once('templateLoaded', bind(this.load, this, videoId));
+    this._service.load(videoId);
   },
 
   play: function() {
-    this._service.player.play(bind(this.emit, this, 'play'));
+    this._service.play();
   },
 
   pause: function() {
-    this._service.player.pause(bind(this.emit, this, 'pause'));
+    this._service.pause();
   }
 
 };
@@ -36,9 +32,6 @@ var playerPrototype = {
 function playerFactory(options) {
   var player = Object.create(playerPrototype);
   player = emitter(player);
-  player.on('templateReady', function(html) {
-    this.element.appendChild(html);
-  });
   player.init(options);
   return player;
 }

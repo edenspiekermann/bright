@@ -3,7 +3,7 @@
 module('Initialization');
 
 test('VideoService', function() {
-  expect(4);
+  expect(2);
 
   var player1 = video({
     element: '#player1',
@@ -14,37 +14,31 @@ test('VideoService', function() {
     playerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
   });
 
-  stop(4);
-  player1.on('templateReady', function() {
-    ok(true, 'template ready (player1)');
+  stop(2);
+  player1.once('init', function() {
+    console.log('init 1');
+    ok(true, 'brightcove for player1 initialized');
     start();
   });
-  player2.on('templateReady', function() {
-    ok(true, 'template ready (player2)');
-    start();
-  });
-  player1.on('templateLoaded', function() {
-    ok(true, 'template loaded (player1)');
-    start();
-  });
-  player2.on('templateLoaded', function() {
-    ok(true, 'template loaded (player2)');
+  player2.once('init', function() {
+    console.log('init 2');
+    ok(true, 'brighcove for player1 initialized');
     start();
   });
 });
 
-test('Video', function() {
-  expect(1);
+// test('Video', function() {
+//   expect(1);
 
-  var player = video({
-    element: '#player1',
-    playerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
-  });
+//   var player = video({
+//     element: '#player1',
+//     playerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
+//   });
 
-  player.on('loadstart', function() {
-    ok(true, 'can load a video');
-    start();
-  });
+//   player.on('loadstart', function() {
+//     ok(true, 'can load a video');
+//     start();
+//   });
 
 //   player.on('play', function() {
 //     ok(true, 'can play a video');
@@ -60,15 +54,15 @@ test('Video', function() {
 //     ok(true, 'emit ended event after video playback');
 //   });
 
-  stop();
-  player.load(1754276221001);
+  // stop();
+  // player.load(1754276221001);
 
 //   stop();
 //   player.play();
 
 //   stop();
 //   player.pause();
-});
+// });
 
 // module('Readable Player Properties');
 // test('Player has a readable volume attribute');

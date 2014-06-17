@@ -1054,6 +1054,7 @@ module.exports = noop;
 },{}],20:[function(_dereq_,module,exports){
 var assign = _dereq_('lodash-node/modern/objects/assign');
 var bind = _dereq_('lodash-node/modern/functions/bind');
+var emitter = _dereq_('component-emitter');
 
 var brightcovePrototype = {
 
@@ -1067,96 +1068,90 @@ var brightcovePrototype = {
     templateReadyHandler: 'brightcove.__bright__.templateReadyHandler'
   },
 
-  init: function(options, templateReady, templateLoaded) {
-    this._createHTML(options, templateReady);
+  init: function(element, options, emitter) {
+    options = assign(this.defaults, options);
+    createHTML(element, options);
+    this.emitter = emitter;
     if (brightcovePrototype.isLoading || brightcovePrototype.hasLoaded) return;
     brightcovePrototype.isLoading = true;
     var script = document.createElement('script');
     script.src = 'http://admin.brightcove.com/js/BrightcoveExperiences.js';
-    script.onload = bind(this._init, this, templateLoaded);
+    script.onload = bind(this._init, this);
     document.body.appendChild(script);
   },
 
-  load: function(videoId, callback) {
+  load: function(videoId) {
     this.player.cueVideoByID(videoId);
-    callback();
   },
 
-  _createHTML: function(options, templateReady) {
-    var object = document.createElement('object');
-    object.className = "BrightcoveExperience";
-    options = assign(this.defaults, options);
-    for (var param in options) {
-      object.appendChild(createParam(param, options[param]));
-    }
-    setTimeout(function() {
-      templateReady(object);
-    });
-
-    function createParam(name, value) {
-      var param = document.createElement('param');
-      param.name = name;
-      param.value = value;
-      return param;
-    }
-  },
-
-  _init: function(templateLoaded) {
+  _init: function() {
     window.brightcove.__bright__ = {};
     window.brightcove.__bright__.templateLoadHandler = bind(function(experienceID) {
       this.api = window.brightcove.api.getExperience(experienceID);
       this.player = this.api.getModule(window.brightcove.api.modules.APIModules.VIDEO_PLAYER);
     }, this);
-    window.brightcove.__bright__.templateReadyHandler = function() {
+    window.brightcove.__bright__.templateReadyHandler = bind(function() {
       brightcovePrototype.hasLoaded = true;
       brightcovePrototype.isLoading = false;
-      setTimeout(function() {
-        templateLoaded();
-      });
-    };
+      setTimeout(bind(function() {
+        this.emitter('init');
+      }, this));
+    }, this);
     window.brightcove.createExperiences();
   }
 
 };
 
 function brightcoveFactory() {
-  return Object.create(brightcovePrototype);
+  return Object.create(emitter(brightcovePrototype));
+}
+
+function createHTML(element, options) {
+  var object = document.createElement('object');
+  object.className = "BrightcoveExperience";
+  for (var param in options) {
+    object.appendChild(createParam(param, options[param]));
+  }
+  element.appendChild(object);
+
+  function createParam(name, value) {
+    var param = document.createElement('param');
+    param.name = name;
+    param.value = value;
+    return param;
+  }
 }
 
 module.exports = brightcoveFactory;
 
-},{"lodash-node/modern/functions/bind":2,"lodash-node/modern/objects/assign":13}],21:[function(_dereq_,module,exports){
+},{"component-emitter":1,"lodash-node/modern/functions/bind":2,"lodash-node/modern/objects/assign":13}],21:[function(_dereq_,module,exports){
 var assign = _dereq_('lodash-node/modern/objects/assign');
 var bind = _dereq_('lodash-node/modern/functions/bind');
 var emitter = _dereq_('component-emitter');
 
-var videoService = _dereq_('./brightcove');
+var defaultVideoService = _dereq_('./brightcove');
 
 var playerPrototype = {
 
-  init: function(options) {
+  init: function(options, videoService) {
     this.element = document.querySelector(options.element);
     delete options.element;
     this.options = assign({}, options);
 
-    this._service = videoService();
-    this._service.init(options, bind(this.emit, this, 'templateReady'), bind(this.emit, this, 'templateLoaded'));
+    this._service = (videoService) ? videoService() : defaultVideoService();
+    this._service.init(this.element, options, bind(this.emit, this));
   },
 
   load: function(videoId) {
-    if (this._service.player) {
-      this._service.load(videoId, bind(this.emit, this, 'loadstart'));
-      return;
-    }
-    this.once('templateLoaded', bind(this.load, this, videoId));
+    this._service.load(videoId);
   },
 
   play: function() {
-    this._service.player.play(bind(this.emit, this, 'play'));
+    this._service.play();
   },
 
   pause: function() {
-    this._service.player.pause(bind(this.emit, this, 'pause'));
+    this._service.pause();
   }
 
 };
@@ -1164,9 +1159,6 @@ var playerPrototype = {
 function playerFactory(options) {
   var player = Object.create(playerPrototype);
   player = emitter(player);
-  player.on('templateReady', function(html) {
-    this.element.appendChild(html);
-  });
   player.init(options);
   return player;
 }
