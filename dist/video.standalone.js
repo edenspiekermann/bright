@@ -1070,14 +1070,12 @@ var brightcove = {
     options = assign(brightcove.defaults, options);
     createHTML(element, options);
     loadHandler[options.element] = bind(function(experienceID) {
-      console.log(experienceID, this);
       this.api = window.brightcove.api.getExperience(experienceID);
       this.player = this.api.getModule(window.brightcove.api.modules.APIModules.VIDEO_PLAYER);
+      window.brightcove.__readyHandler__[experienceID] = function() {
+        emitter('init');
+      };
     }, this);
-    readyHandler[options.element] = function() {
-      console.log('ready');
-      emitter('init');
-    };
   },
 
   load: function(videoId) {
@@ -1098,22 +1096,20 @@ function insertBrightcoveScript() {
     brightcove.isLoading = false;
     brightcove.hasLoaded = true;
     window.brightcove.__load__ = {};
-    window.brightcove.__ready__ = {};
+    window.brightcove.__ready__ = function(event) {
+      window.brightcove.__readyHandler__[event.target.experience.id]();
+    };
+    window.brightcove.__readyHandler__ = {};
     addHandlers();
   };
   document.body.appendChild(script);
 }
 
 var loadHandler = {};
-var readyHandler = {};
-
 function addHandlers() {
   var handler;
   for (handler in loadHandler) {
     window.brightcove.__load__[handler] = loadHandler[handler];
-  }
-  for (handler in readyHandler) {
-    window.brightcove.__ready__[handler] = readyHandler[handler];
   }
   window.brightcove.createExperiences();
 }
@@ -1124,11 +1120,11 @@ function createHTML(element, options) {
   for (var param in options) {
     if (param === 'element') {
       object.appendChild(createParam('templateLoadHandler', "brightcove.__load__['"+options[param]+"']"));
-      object.appendChild(createParam('templateReadyHandler', "brightcove.__ready__['"+options[param]+"']"));
       continue;
     }
     object.appendChild(createParam(param, options[param]));
   }
+  object.appendChild(createParam('templateReadyHandler', "brightcove.__ready__"));
   element.appendChild(object);
 
   function createParam(name, value) {
