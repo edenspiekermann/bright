@@ -1078,7 +1078,7 @@ var brightcovePrototype = {
   },
 
   load: function(videoId, callback) {
-    brightcove.player.cueVideoByID(videoId);
+    this.player.cueVideoByID(videoId);
     callback();
   },
 
@@ -1110,7 +1110,9 @@ var brightcovePrototype = {
     window.brightcove.__bright__.templateReadyHandler = function() {
       brightcovePrototype.hasLoaded = true;
       brightcovePrototype.isLoading = false;
-      templateLoaded();
+      setTimeout(function() {
+        templateLoaded();
+      });
     };
     window.brightcove.createExperiences();
   }
@@ -1143,13 +1145,10 @@ var playerPrototype = {
 
   load: function(videoId) {
     if (this._service.player) {
-      this._service.player.load(videoId, bind(this.emit, this, 'loadstart'));
-      this.emit('loadstart');
+      this._service.load(videoId, bind(this.emit, this, 'loadstart'));
       return;
     }
-    this.once('templateLoaded', function() {
-      this.load(videoId);
-    }, this);
+    this.once('templateLoaded', bind(this.load, this, videoId));
   },
 
   play: function() {

@@ -17,13 +17,10 @@ var playerPrototype = {
 
   load: function(videoId) {
     if (this._service.player) {
-      this._service.player.load(videoId, bind(this.emit, this, 'loadstart'));
-      this.emit('loadstart');
+      this._service.load(videoId, bind(this.emit, this, 'loadstart'));
       return;
     }
-    this.once('templateLoaded', function() {
-      this.load(videoId);
-    }, this);
+    this.once('templateLoaded', bind(this.load, this, videoId));
   },
 
   play: function() {

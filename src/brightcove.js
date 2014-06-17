@@ -24,7 +24,7 @@ var brightcovePrototype = {
   },
 
   load: function(videoId, callback) {
-    brightcove.player.cueVideoByID(videoId);
+    this.player.cueVideoByID(videoId);
     callback();
   },
 
@@ -56,7 +56,9 @@ var brightcovePrototype = {
     window.brightcove.__bright__.templateReadyHandler = function() {
       brightcovePrototype.hasLoaded = true;
       brightcovePrototype.isLoading = false;
-      templateLoaded();
+      setTimeout(function() {
+        templateLoaded();
+      });
     };
     window.brightcove.createExperiences();
   }
