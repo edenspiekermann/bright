@@ -4,6 +4,7 @@ module('Initialization');
 
 test('VideoService', function() {
   expect(2);
+  stop(2);
 
   var player1 = video({
     element: '#player1',
@@ -14,14 +15,11 @@ test('VideoService', function() {
     playerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
   });
 
-  stop(2);
   player1.once('init', function() {
-    console.log('init 1');
     ok(true, 'brightcove for player1 initialized');
     start();
   });
   player2.once('init', function() {
-    console.log('init 2');
     ok(true, 'brighcove for player1 initialized');
     start();
   });

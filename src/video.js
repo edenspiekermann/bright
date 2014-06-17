@@ -8,7 +8,6 @@ var playerPrototype = {
 
   init: function(options, videoService) {
     this.element = document.querySelector(options.element);
-    delete options.element;
     this.options = assign({}, options);
 
     this._service = (videoService) ? videoService() : defaultVideoService();
