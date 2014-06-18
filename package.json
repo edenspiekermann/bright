@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "scripts": {
-    "start": "webpack src/video.js dist/video.standalone.js --output-library video --output-library-target umd --watch",
+    "start": "webpack src/video.js dist/video.standalone.js --output-library video --output-library-target umd --watch --progress --colors",
     "build": "npm run build-common && npm run build-common-min && npm run build-standalone && npm run build-standalone-min",
     "build-common": "webpack src/video.js dist/video.js",
     "build-common-min": "webpack src/video.js dist/video.js --optimize-minimize",
