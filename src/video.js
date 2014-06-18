@@ -6,12 +6,12 @@ var defaultVideoService = require('./brightcove');
 
 var playerPrototype = {
 
-  init: function(options, videoService) {
-    this.element = document.querySelector(options.element);
+  init: function(element, options, videoService) {
+    this.element = element;
     this.options = assign({}, options);
+    this._service = (videoService) ? videoService : defaultVideoService;
 
-    this._service = (videoService) ? videoService() : defaultVideoService();
-    this._service.init(this.element, options, bind(this.emit, this));
+    this._service.init(this.element, this.options, bind(this.emit, this));
   },
 
   load: function(videoId) {
@@ -28,10 +28,10 @@ var playerPrototype = {
 
 };
 
-function playerFactory(options) {
+function playerFactory(element, options) {
   var player = Object.create(playerPrototype);
   player = emitter(player);
-  player.init(options);
+  player.init(element, options);
   return player;
 }
 

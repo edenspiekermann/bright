@@ -6,12 +6,13 @@ test('VideoService', function() {
   expect(2);
   stop(2);
 
-  var player1 = video({
-    element: '#player1',
+  var element1 = document.getElementById('player1');
+  var element2 = document.getElementById('player2');
+
+  var player1 = video(element1, {
     playerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
   });
-  var player2 = video({
-    element: '#player2',
+  var player2 = video(element2, {
     playerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
   });
 
