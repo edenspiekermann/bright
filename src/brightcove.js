@@ -3,70 +3,63 @@ var bind = require('lodash-node/modern/functions/bind');
 
 var brightcove = {
 
-  uniqueId: 0,
-
   defaults: {
     isVid: true,
     isUI: true,
     includeAPI: true,
     wmode: 'transparent',
-    bgcolor: 'transparent'
+    bgcolor: '#ffffff',
+    templateLoadHandler: 'brightcove.__videoplayerLoad',
+    templateReadyHandler: 'brightcove.__videoplayerReady'
   },
 
-  init: function(element, options, emitter) {
-    if (!this.isLoading && !this.hasLoaded) insertScript();
+  init: function(element, options, callback) {
     options = assign(this.defaults, options);
-    createHTML(element, this.uniqueId, options);
-    loadHandler[this.uniqueId] = bind(function(experienceID) {
-      this.api = window.brightcove.api.getExperience(experienceID);
-      this.player = this.api.getModule(window.brightcove.api.modules.APIModules.VIDEO_PLAYER);
-      window.brightcove.__readyHandlers__[experienceID] = function() {
-        emitter('init');
-      };
-    }, this);
-    this.uniqueId++;
-  },
 
-  load: function(videoId) {
-    this.player.cueVideoByID(videoId);
+    this.id = 'brightcove'+getUniqueId();
+    var object = createObjectTag(element, options);
+    object.id = this.id;
+    element.appendChild(object);
+
+    loadHandlers[this.id] = bind(function() {
+      this.api = window.brightcove.api.getExperience(this.id);
+      this.player = this.api.getModule(window.brightcove.api.modules.APIModules.VIDEO_PLAYER);
+    }, this);
+    readyHandlers[this.id] = callback;
+
+    window.brightcove.createExperience(object, object);
   }
 
 };
 
-function insertScript() {
-  brightcove.isLoading = true;
-  var script = document.createElement('script');
-  script.src = 'http://admin.brightcove.com/js/BrightcoveExperiences.js';
-  script.onload = function() {
-    brightcove.isLoading = false;
-    brightcove.hasLoaded = true;
-    window.brightcove.__loadHandlers__ = {};
-    window.brightcove.__readyHandlers__ = {};
-    window.brightcove.__ready__ = function(event) {
-      window.brightcove.__readyHandlers__[event.target.experience.id]();
-    };
-    addHandlers();
+var getUniqueId = (function() {
+  var id = 0;
+  return function() {
+    return id++;
   };
-  document.body.appendChild(script);
-}
+})();
 
-var loadHandler = {};
-function addHandlers() {
-  for (var handler in loadHandler) {
-    window.brightcove.__loadHandlers__[handler] = loadHandler[handler];
-  }
-  window.brightcove.createExperiences();
-}
+var readyHandlers = {};
+var loadHandlers = {};
 
-function createHTML(element, id, options) {
+window.brightcove.__videoplayerReady = (function() {
+  return function(event) {
+    readyHandlers[event.target.experience.id]();
+  };
+})();
+window.brightcove.__videoplayerLoad = (function() {
+  return function(id) {
+    loadHandlers[id]();
+  };
+})();
+
+function createObjectTag(element, options) {
   var object = document.createElement('object');
   object.className = "BrightcoveExperience";
   for (var param in options) {
     object.appendChild(createParam(param, options[param]));
   }
-  object.appendChild(createParam('templateLoadHandler', "brightcove.__loadHandlers__['"+id+"']"));
-  object.appendChild(createParam('templateReadyHandler', "brightcove.__ready__"));
-  element.appendChild(object);
+  return object;
 
   function createParam(name, value) {
     var param = document.createElement('param');
@@ -76,4 +69,8 @@ function createHTML(element, id, options) {
   }
 }
 
-module.exports = brightcove;
+function brightcoveFactory() {
+  return Object.create(brightcove);
+}
+
+module.exports = brightcoveFactory;

@@ -9,9 +9,10 @@ var playerPrototype = {
   init: function(element, options, videoService) {
     this.element = element;
     this.options = assign({}, options);
-    this._service = (videoService) ? videoService : defaultVideoService;
+    this._service = (videoService) ? videoService() : defaultVideoService();
 
-    this._service.init(this.element, this.options, bind(this.emit, this));
+    this._service.init(this.element, this.options, bind(this.emit, this, 'init', this));
+    return this;
   },
 
   load: function(videoId) {
@@ -28,11 +29,10 @@ var playerPrototype = {
 
 };
 
-function playerFactory(element, options) {
+function playerFactory() {
   var player = Object.create(playerPrototype);
   player = emitter(player);
-  player.init(element, options);
-  return player;
+  return player.init.apply(player, arguments);
 }
 
 module.exports = playerFactory;

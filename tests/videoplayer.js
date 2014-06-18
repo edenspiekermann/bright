@@ -1,4 +1,4 @@
-/* global video, test, expect, ok, stop, start */
+/* global videoplayer, test, expect, ok, stop, start */
 
 module('Initialization');
 
@@ -9,19 +9,19 @@ test('VideoService', function() {
   var element1 = document.getElementById('player1');
   var element2 = document.getElementById('player2');
 
-  var player1 = video(element1, {
+  var player1 = videoplayer(element1, {
     playerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
   });
-  var player2 = video(element2, {
+  var player2 = videoplayer(element2, {
     playerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
   });
 
-  player1.once('init', function() {
-    ok(true, 'brightcove for player1 initialized');
+  player1.once('init', function(player) {
+    ok(player, 'init event for player1 has been fired');
     start();
   });
-  player2.once('init', function() {
-    ok(true, 'brighcove for player1 initialized');
+  player2.once('init', function(player) {
+    ok(player, 'init event for player2 has been fired');
     start();
   });
 });

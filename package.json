@@ -1,18 +1,18 @@
 {
-  "name": "video",
+  "name": "videoplayer",
   "version": "0.0.1",
   "description": "easy videoplayer abstraction",
-  "main": "src/video.js",
+  "main": "src/videoplayer.js",
   "directories": {
     "test": "tests"
   },
   "scripts": {
-    "start": "webpack src/video.js dist/video.standalone.js --output-library video --output-library-target umd --watch --progress --colors",
+    "start": "webpack src/videoplayer.js dist/videoplayer.standalone.js --output-library videoplayer --output-library-target umd --watch --progress --colors",
     "build": "npm run build-common && npm run build-common-min && npm run build-standalone && npm run build-standalone-min",
-    "build-common": "webpack src/video.js dist/video.js",
-    "build-common-min": "webpack src/video.js dist/video.js --optimize-minimize",
-    "build-standalone": "webpack src/video.js dist/video.standalone.js --output-library video --output-library-target umd",
-    "build-standalone-min": "webpack src/video.js dist/video.standalone.js --output-library video --output-library-target umd --optimize-minimize",
+    "build-common": "webpack src/videoplayer.js dist/videoplayer.js",
+    "build-common-min": "webpack src/videoplayer.js dist/videoplayer.min.js --optimize-minimize",
+    "build-standalone": "webpack src/videoplayer.js dist/videoplayer.standalone.js --output-library videoplayer --output-library-target umd",
+    "build-standalone-min": "webpack src/videoplayer.js dist/videoplayer.standalone.min.js --output-library videoplayer --output-library-target umd --optimize-minimize",
     "test": "open 'http://localhost:8000/tests/index.html' && python -m SimpleHTTPServer"
   },
   "author": "edenspiekermann",
