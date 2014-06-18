@@ -67,12 +67,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.options = assign({}, options);
 	    this._service = (videoService) ? videoService() : defaultVideoService();
 
-	    this._service.init(this.element, this.options, bind(this.emit, this, 'init', this));
+	    var callbacks = {
+	      init: bind(this.emit, this, 'init', this),
+	      play: bind(this.emit, this, 'play', this),
+	      pause: bind(this.emit, this, 'pause', this),
+	      ended: bind(this.emit, this, 'ended', this)
+	    };
+
+	    this._service.init(this.element, this.options, callbacks);
 	    return this;
 	  },
 
 	  load: function(videoId) {
-	    this._service.load(videoId);
+	    this._service.load(videoId, bind(this.emit, this, 'loadstart', this));
 	  },
 
 	  play: function() {
@@ -113,7 +120,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    templateReadyHandler: 'brightcove.__videoplayerReady'
 	  },
 
-	  init: function(element, options, callback) {
+	  init: function(element, options, callbacks) {
 	    options = assign(this.defaults, options);
 
 	    this.id = 'brightcove'+getUniqueId();
@@ -125,9 +132,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.api = window.brightcove.api.getExperience(this.id);
 	      this.player = this.api.getModule(window.brightcove.api.modules.APIModules.VIDEO_PLAYER);
 	    }, this);
-	    readyHandlers[this.id] = callback;
+	    readyHandlers[this.id] = bind(function() {
+	      this.player.addEventListener(window.brightcove.api.events.MediaEvent.PLAY, callbacks.play);
+	      this.player.addEventListener(window.brightcove.api.events.MediaEvent.STOP, callbacks.pause);
+	      this.player.addEventListener(window.brightcove.api.events.MediaEvent.COMPLETE, callbacks.ended);
+	      callbacks.init();
+	    }, this);
 
 	    window.brightcove.createExperience(object, object);
+	  },
+
+	  load: function(id, triggerLoadStart) {
+	    this.player.cueVideoByID(id);
+	    triggerLoadStart();
+	  },
+
+	  play: function() {
+	    this.player.play();
+	  },
+
+	  pause: function() {
+	    this.player.pause();
 	  }
 
 	};

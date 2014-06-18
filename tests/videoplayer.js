@@ -26,42 +26,48 @@ test('VideoService', function() {
   });
 });
 
-// test('Video', function() {
-//   expect(1);
+test('Player', function() {
+  expect(4);
+  stop(4);
 
-//   var player = video({
-//     element: '#player1',
-//     playerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
-//   });
+  var element = document.getElementById('player1');
 
-//   player.on('loadstart', function() {
-//     ok(true, 'can load a video');
-//     start();
-//   });
+  var player = videoplayer(element, {
+    playerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
+  });
 
-//   player.on('play', function() {
-//     ok(true, 'can play a video');
-//     start();
-//   });
+  player.on('init', function(player) {
+    console.log('init');
+    player.load(1926945850001);
+  });
 
-//   player.on('pause', function() {
-//     ok(true, 'can pause a video');
-//     start();
-//   });
+  player.on('loadstart', function(player) {
+    console.log('loadstart');
+    ok(true, 'can load a video');
+    start();
+    setTimeout(function() {
+      player.play();
+    },500);
+  });
 
-//   player.on('ended', function() {
-//     ok(true, 'emit ended event after video playback');
-//   });
+  player.on('play', function() {
+    console.log('play');
+    ok(true, 'can play a video');
+    start();
+  });
 
-  // stop();
-  // player.load(1754276221001);
+  player.on('pause', function() {
+    console.log('pause');
+    ok(true, 'can pause a video');
+    start();
+  });
 
-//   stop();
-//   player.play();
-
-//   stop();
-//   player.pause();
-// });
+  player.once('ended', function() {
+    console.log('ended');
+    ok(true, 'emit ended event after video playback');
+    start();
+  });
+});
 
 // module('Readable Player Properties');
 // test('Player has a readable volume attribute');
