@@ -37,7 +37,9 @@ var brightcove = {
 
   load: function(id, triggerLoadStart) {
     this.player.cueVideoByID(id);
-    triggerLoadStart();
+    setTimeout(function() {
+      triggerLoadStart();
+    }, 300);
   },
 
   play: function() {

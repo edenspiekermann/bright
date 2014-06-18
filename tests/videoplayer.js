@@ -36,30 +36,35 @@ test('Player', function() {
     playerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
   });
 
-  player.on('init', function(player) {
+  player.once('init', function(player) {
     console.log('init');
     player.load(1926945850001);
   });
 
-  player.on('loadstart', function(player) {
+  player.once('loadstart', function(player) {
     console.log('loadstart');
     ok(true, 'can load a video');
     start();
-    setTimeout(function() {
-      player.play();
-    },500);
+
+    player.play();
   });
 
-  player.on('play', function() {
+  player.once('play', function(player) {
     console.log('play');
     ok(true, 'can play a video');
     start();
+    setTimeout(function() {
+      player.pause();
+    }, 3000);
   });
 
-  player.on('pause', function() {
+  player.once('pause', function(player) {
     console.log('pause');
     ok(true, 'can pause a video');
     start();
+    setTimeout(function() {
+      player.play();
+    }, 1000);
   });
 
   player.once('ended', function() {
