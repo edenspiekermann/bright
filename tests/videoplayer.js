@@ -4,6 +4,11 @@ var testData = {
   brightcoveVideoId: 1926945850001,
   brightcovePlayerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
 };
+function log(event) {
+  return function() {
+    if (console) console.log(event);
+  };
+}
 
 module('Initialization');
 
@@ -96,18 +101,16 @@ test('Player', function() {
     start();
   });
 
-  // -- Logging for debugging --
-  // player1.on('init', log('init'));
-  // player1.on('loadstart', log('loadstart'));
-  // player1.on('play', log('play'));
-  // player1.on('pause', log('pause'));
-  // player1.on('ended', log('ended'));
-  // player2.on('init', log('init'));
-  // player2.on('loadstart', log('loadstart'));
-  // player2.on('play', log('play'));
-  // player2.on('pause', log('pause'));
-  // player2.on('ended', log('ended'));
-  // function log(event) { return function() { console.log(event); }; }
+  player1.on('init', log('init'));
+  player1.on('loadstart', log('loadstart'));
+  player1.on('play', log('play'));
+  player1.on('pause', log('pause'));
+  player1.on('ended', log('ended'));
+  player2.on('init', log('init'));
+  player2.on('loadstart', log('loadstart'));
+  player2.on('play', log('play'));
+  player2.on('pause', log('pause'));
+  player2.on('ended', log('ended'));
 });
 
 test('Player', function() {
