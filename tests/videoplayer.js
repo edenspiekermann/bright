@@ -144,3 +144,38 @@ test('Error', function() {
     player.load();
   }, 'is thrown when no videoId is passed to load()');
 });
+
+test('CSS', function() {
+  expect(1);
+  stop();
+
+  var element = document.getElementById('player1');
+  var wrapper = document.getElementById('qunit-fixture');
+
+  var player = videoplayer(element, {
+    playerKey: testData.brightcovePlayerKey
+  });
+
+  player.load(testData.brightcoveVideoId);
+
+  setTimeout(function() {
+    wrapper.style.cssText = "display:none";
+
+    setTimeout(function() {
+      wrapper.style.cssText = "";
+
+      player.init();
+
+      player.once('loadstart', function() {
+        ok(true, 'changes reinitialize the player without losing its videoId');
+        start();
+      });
+    }, 2000);
+  }, 2000);
+
+  player.on('init', log('init'));
+  player.on('loadstart', log('loadstart'));
+  player.on('play', log('play'));
+  player.on('pause', log('pause'));
+  player.on('ended', log('ended'));
+});
