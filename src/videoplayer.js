@@ -11,7 +11,7 @@ var playerPrototype = {
     this.options = assign({}, options);
     this._service = (videoService) ? videoService() : defaultVideoService();
 
-    var callbacks = {
+    var events = {
       init: bind(this.emit, this, 'init', this),
       play: bind(this.emit, this, 'play', this),
       pause: bind(this.emit, this, 'pause', this),
@@ -19,7 +19,7 @@ var playerPrototype = {
       ended: bind(this.emit, this, 'ended', this)
     };
 
-    this._service.init(this.element, this.options, callbacks);
+    this._service.init(this.element, this.options, events);
     return this;
   },
 
@@ -29,8 +29,8 @@ var playerPrototype = {
     return this;
   },
 
-  play: function() {
-    this._service.play(bind(this.emit, this, 'play', this));
+  play: function(videoId) {
+    this._service.play(videoId, bind(this.emit, this, 'play', this));
     return this;
   },
 

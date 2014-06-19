@@ -46,8 +46,9 @@ var brightcove = {
     emitLoadstart();
   },
 
-  play: function() {
+  play: function(videoId) {
     if (!this._isReady) {
+      if (videoId) this._loadedVideo = videoId;
       this._shouldPlay = true;
       return;
     }

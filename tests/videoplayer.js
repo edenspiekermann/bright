@@ -110,6 +110,24 @@ test('Player', function() {
   // function log(event) { return function() { console.log(event); }; }
 });
 
+test('Player', function() {
+  expect(1);
+  stop();
+
+  var element = document.getElementById('player1');
+
+  var player = videoplayer(element, {
+    playerKey: testData.brightcovePlayerKey
+  });
+
+  player.play(testData.brightcoveVideoId);
+
+  player.once('play', function() {
+    ok(true, 'can directly play a video via its ID');
+    start();
+  });
+});
+
 test('Error', function() {
   expect(1);
 
