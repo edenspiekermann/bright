@@ -131,7 +131,9 @@ test('Player', function() {
   });
 });
 
-test('Error', function() {
+module('Error Handling');
+
+test('Wrong Usage', function() {
   expect(1);
 
   var element = document.getElementById('player1');
@@ -142,7 +144,7 @@ test('Error', function() {
 
   throws(function() {
     player.load();
-  }, 'is thrown when no videoId is passed to load()');
+  }, 'you have to pass a videoId to load');
 });
 
 test('CSS', function() {
@@ -167,7 +169,7 @@ test('CSS', function() {
       player.init();
 
       player.once('loadstart', function() {
-        ok(true, 'changes reinitialize the player without losing its videoId');
+        ok(true, 'player can be reinitialized after it was hidden via CSS');
         start();
       });
     }, 2000);
