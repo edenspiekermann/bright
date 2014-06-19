@@ -86,6 +86,8 @@ __Required:__ `//admin.brightcove.com/js/BrightcoveExperiences.js` has to be loa
 <script src="main.js"></script>
 ```
 
+Video and player id for testing are taken from [brightcoves example page](http://files.brightcove.com/content.html). You have to update them if they change.
+
 
 ## Development
 
