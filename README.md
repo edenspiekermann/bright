@@ -12,6 +12,6 @@ This abstraction wraps the Brightcove video player API with the official HTML5 M
 2. `npm install`
 3. `npm start` to watch for file changes in `src/videoplayer.js`
 4. make changes
-5. `npm test` starts a local webserver and opens your default browser `http://localhost:8000/tests`
-6. `npm run build` if all your tests pass
+5. `npm test` starts a local server & opens your default browser with `http://localhost:8000/tests`
+6. `npm run build` if all tests pass
 7. push to `develop`, merge into `master`
