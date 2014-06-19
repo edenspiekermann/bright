@@ -47,33 +47,39 @@ ___Note:___ If you want to use brightcove make sure to [add its script](#brightc
 
 ## API
 
-initialization
 ```js
 var player = videoplayer(domElement, options, videoService);
 
 // omit video service if you use brightcove
 var brightcovePlayer = videoplayer(domElement, options);
-```
 
-loading a video via its ID
-```js
 player.load(videoId);
-```
-
-play the loaded video
-```js
 player.play();
-```
-
-pause the video
-```js
 player.pause();
+
+// you may chain methods
+player.load(videoId).play();
+
+// events
+player.on('ended', function(player) {
+  player.load(nextVideoID);
+});
 ```
 
-chaining
-```js
-var player = videoplayer(domElement, options).load(videoId).play();
-```
+Event methods are copied from [component/emitter](https://github.com/component/emitter):
+- on(event, fn)
+- once(event, fn)
+- off(event, fn)
+- emit(event, …)
+- listeners(event)
+- hasListeners(event)
+
+Currently supported events:
+- init
+- loadstart
+- play
+- pause
+- ended
 
 
 ## Brightcove
