@@ -49,6 +49,7 @@ Global Variable
 <script src="main.js">
 ```
 ```js
+// main.js
 var player = videoplayer(domElement, options);
 ```
 
