@@ -8,7 +8,7 @@ Brightcove is the default video provider and currently built into the library it
 
 ## API
 
-### initialization
+__initialization__
 ```js
 var player = videoplayer(domElement, options, videoService);
 
@@ -16,22 +16,22 @@ var player = videoplayer(domElement, options, videoService);
 var brightcovePlayer = videoplayer(domElement, options);
 ```
 
-### loading a video via its ID
+__loading a video via its ID__
 ```js
 player.load(videoId);
 ```
 
-### play the loaded video
+__play the loaded video__
 ```js
 player.play();
 ```
 
-### pause the video
+__pause the video__
 ```js
 player.pause();
 ```
 
-### chaining
+__chaining__
 ```js
 var player = videoplayer(domElement, options).load(videoId).play();
 ```
