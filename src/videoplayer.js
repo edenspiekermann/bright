@@ -24,7 +24,7 @@ var playerPrototype = {
   },
 
   load: function(videoId) {
-    if (typeof videoId === 'undefined') throw new Error('missing video id');
+    if (!videoId) throw new Error('missing video id');
     this._service.load(videoId, bind(this.emit, this, 'loadstart', this));
     return this;
   },
