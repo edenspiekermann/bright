@@ -2,7 +2,7 @@
   "name": "videoplayer",
   "version": "0.0.1",
   "description": "easy videoplayer abstraction",
-  "main": "src/videoplayer.js",
+  "main": "dist/videoplayer.js",
   "directories": {
     "test": "tests"
   },
