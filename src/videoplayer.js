@@ -25,17 +25,17 @@ var playerPrototype = {
 
   load: function(videoId) {
     if (!videoId) throw new Error('missing video id');
-    this._service.load(videoId, bind(this.emit, this, 'loadstart', this));
+    this._service.load(videoId);
     return this;
   },
 
   play: function(videoId) {
-    this._service.play(videoId, bind(this.emit, this, 'play', this));
+    this._service.play(videoId);
     return this;
   },
 
   pause: function() {
-    this._service.pause(bind(this.emit, this, 'pause', this));
+    this._service.pause();
     return this;
   }
 

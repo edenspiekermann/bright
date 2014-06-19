@@ -14,37 +14,28 @@ var brightcove = {
   },
 
   init: function(element, options, emit) {
-    options = assign(this.defaults, options);
+    this.element = element;
+    this.options = assign(this.defaults, options);
+    this.emit = emit;
 
     this.id = 'brightcove'+getUniqueId();
-    var object = createObjectTag(element, options);
+    var object = createObjectTag(this.element, this.options);
     object.id = this.id;
-    element.innerHTML = '';
-    element.appendChild(object);
+    this.element.innerHTML = '';
+    this.element.appendChild(object);
 
-    loadHandlers[this.id] = bind(function() {
-      this.api = window.brightcove.api.getExperience(this.id);
-      this.player = this.api.getModule(window.brightcove.api.modules.APIModules.VIDEO_PLAYER);
-    }, this);
-    readyHandlers[this.id] = bind(function() {
-      this.player.addEventListener(window.brightcove.api.events.MediaEvent.PLAY, emit.play);
-      this.player.addEventListener(window.brightcove.api.events.MediaEvent.STOP, emit.pause);
-      this.player.addEventListener(window.brightcove.api.events.MediaEvent.COMPLETE, emit.ended);
-      emit.init();
-      this._isReady = true;
-      if (this._loadedVideo) this.load(this._loadedVideo, emit.loadstart);
-      if (this._shouldPlay) setTimeout(bind(this.play,this), 500);
-    }, this);
+    loadHandlers[this.id] = bind(loadHandler, this);
+    readyHandlers[this.id] = bind(readyHandler, this);
 
     window.brightcove.createExperience(object, object);
   },
 
-  load: function(videoId, emitLoadstart) {
+  load: function(videoId) {
     this._loadedVideo = videoId;
     if (!this._isReady) return;
     this.player.cueVideoByID(videoId);
     delete this._loadedVideo;
-    emitLoadstart();
+    this.emit.loadstart();
   },
 
   play: function(videoId) {
@@ -72,6 +63,20 @@ var getUniqueId = (function() {
 
 var readyHandlers = {};
 var loadHandlers = {};
+
+function loadHandler() {
+  this.api = window.brightcove.api.getExperience(this.id);
+  this.player = this.api.getModule(window.brightcove.api.modules.APIModules.VIDEO_PLAYER);
+}
+function readyHandler() {
+  this.player.addEventListener(window.brightcove.api.events.MediaEvent.PLAY, this.emit.play);
+  this.player.addEventListener(window.brightcove.api.events.MediaEvent.STOP, this.emit.pause);
+  this.player.addEventListener(window.brightcove.api.events.MediaEvent.COMPLETE, this.emit.ended);
+  this.emit.init();
+  this._isReady = true;
+  if (this._loadedVideo) this.load(this._loadedVideo, this.emit.loadstart);
+  if (this._shouldPlay) setTimeout(bind(this.play,this), 500);
+}
 
 window.brightcove.__videoplayerReady = (function() {
   return function(event) {
