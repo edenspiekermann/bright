@@ -7,13 +7,11 @@
     "test": "tests"
   },
   "scripts": {
-    "start": "webpack src/videoplayer.js dist/videoplayer.standalone.js --output-library videoplayer --output-library-target umd --watch --progress --colors",
-    "build": "npm run build-common && npm run build-common-min && npm run build-standalone && npm run build-standalone-min",
-    "build-common": "webpack src/videoplayer.js dist/videoplayer.js",
-    "build-common-min": "webpack src/videoplayer.js dist/videoplayer.min.js --optimize-minimize",
-    "build-standalone": "webpack src/videoplayer.js dist/videoplayer.standalone.js --output-library videoplayer --output-library-target umd",
-    "build-standalone-min": "webpack src/videoplayer.js dist/videoplayer.standalone.min.js --output-library videoplayer --output-library-target umd --optimize-minimize",
-    "test": "open 'http://localhost:8000/tests/index.html' && python -m SimpleHTTPServer"
+    "start": "webpack src/videoplayer.js dist/videoplayer.js --watch --output-library videoplayer --output-library-target umd --progress --colors",
+    "build": "npm run build-dev; npm run build-min",
+    "build-dev": "webpack src/videoplayer.js dist/videoplayer.js --output-library videoplayer --output-library-target umd --progress --colors",
+    "build-min": "webpack src/videoplayer.js dist/videoplayer.min.js --optimize-minimize --output-library videoplayer --output-library-target umd --progress --colors",
+    "test": "open 'http://localhost:8000/tests' && python -m SimpleHTTPServer"
   },
   "author": "edenspiekermann",
   "license": "MIT",
