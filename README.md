@@ -1,6 +1,6 @@
 # Videoplayer
 
-This abstraction wraps any video service with the official HTML5 Media and Media Events API. It does not always have a complete feature parity, due to the lack of some features the video servies don’t provide. An example of the HTML5 Media API can be found at [http://www.w3.org/2010/05/video/mediaevents.html](here).
+This abstraction wraps any video service with the official HTML5 Media and Media Events API. It does not always have a complete feature parity, due to the lack of some features the video services don’t provide. An example of the HTML5 Media API can be found at [http://www.w3.org/2010/05/video/mediaevents.html](here).
 
 
 ## Installation
