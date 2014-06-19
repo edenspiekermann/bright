@@ -60,6 +60,9 @@ player.pause();
 // you may chain methods
 player.load(videoId).play();
 
+// or use play directly
+player.play(videoId);
+
 // events
 player.on('ended', function(player) {
   player.load(nextVideoID);
