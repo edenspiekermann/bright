@@ -19,6 +19,7 @@ var brightcove = {
     this.id = 'brightcove'+getUniqueId();
     var object = createObjectTag(element, options);
     object.id = this.id;
+    element.innerHTML = '';
     element.appendChild(object);
 
     loadHandlers[this.id] = bind(function() {
