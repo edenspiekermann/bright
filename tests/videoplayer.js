@@ -1,4 +1,9 @@
-/* global videoplayer, test, expect, ok, stop, start */
+/* global videoplayer, test, expect, ok, stop, start, throws */
+
+var testData = {
+  brightcoveVideoId: 1926945850001,
+  brightcovePlayerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
+};
 
 module('Initialization');
 
@@ -10,10 +15,10 @@ test('Brightcove (default video service)', function() {
   var element2 = document.getElementById('player2');
 
   var player1 = videoplayer(element1, {
-    playerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
+    playerKey: testData.brightcovePlayerKey
   });
   var player2 = videoplayer(element2, {
-    playerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
+    playerKey: testData.brightcovePlayerKey
   });
 
   player1.once('init', function(player) {
@@ -32,17 +37,16 @@ test('Player', function() {
   expect(6);
   stop(6);
 
-  var testVideoId = 1926945850001;
   var element1 = document.getElementById('player1');
   var element2 = document.getElementById('player2');
 
   var player1 = videoplayer(element1, {
-    playerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
+    playerKey: testData.brightcovePlayerKey
   });
   var player2 = videoplayer(element2, {
-    playerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
+    playerKey: testData.brightcovePlayerKey
   });
-  player1.load(testVideoId);
+  player1.load(testData.brightcoveVideoId);
   player1.play();
 
   player1.once('loadstart', function() {
@@ -76,7 +80,7 @@ test('Player', function() {
     ok(true, 'emit ended event after video playback');
     start();
 
-    player2.load(testVideoId);
+    player2.load(testData.brightcoveVideoId);
   });
 
   player2.once('loadstart', function() {
@@ -104,4 +108,18 @@ test('Player', function() {
   // player2.on('pause', log('pause'));
   // player2.on('ended', log('ended'));
   // function log(event) { return function() { console.log(event); }; }
+});
+
+test('Error', function() {
+  expect(1);
+
+  var element = document.getElementById('player1');
+
+  var player = videoplayer(element, {
+    playerKey: testData.brightcovePlayerKey
+  });
+
+  throws(function() {
+    player.load();
+  }, 'is thrown when no videoId is passed to load()');
 });
