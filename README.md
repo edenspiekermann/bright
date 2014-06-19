@@ -1,10 +1,10 @@
-# Bright
+# Videoplayer
 
-easy brightcove abstraction for IE8+
+This abstraction wraps any video service with the official HTML5 Media and Media Events API. It does not always have a complete feature parity, due to the lack of some features the video servies don’t provide. An example of the HTML5 Media API can be found [http://www.w3.org/2010/05/video/mediaevents.html](here).
 
-## About
+## Brightcove
 
-This abstraction wraps the Brightcove video player API with the official HTML5 Media and Media Events API. It does not have a complete feature parity, due to the lack of some features Brightcove doesn’t provide. An example of the HTML5 Media API can be found [http://www.w3.org/2010/05/video/mediaevents.html](here).
+Brightcove is the default video provider and currently built into the library itself, as it was built solely as an abstraction for Brightcove in the first place. During development it became clear that it could easily be extended, so it was rewritten in a more generic approach. The tight coupling with brightcove may be removed in future versions.
 
 ## Development
 
