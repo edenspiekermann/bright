@@ -2,7 +2,7 @@
 
 module('Initialization');
 
-test('VideoService', function() {
+test('Brightcove (default video service)', function() {
   expect(2);
   stop(2);
 
@@ -26,78 +26,82 @@ test('VideoService', function() {
   });
 });
 
+module('API');
+
 test('Player', function() {
-  expect(4);
-  stop(4);
+  expect(6);
+  stop(6);
 
-  var element = document.getElementById('player1');
+  var testVideoId = 1926945850001;
+  var element1 = document.getElementById('player1');
+  var element2 = document.getElementById('player2');
 
-  var player = videoplayer(element, {
+  var player1 = videoplayer(element1, {
     playerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
   });
-
-  player.once('init', function(player) {
-    console.log('init');
-    player.load(1926945850001);
+  var player2 = videoplayer(element2, {
+    playerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
   });
+  player1.load(testVideoId);
+  player1.play();
 
-  player.once('loadstart', function(player) {
-    console.log('loadstart');
+  player1.once('loadstart', function() {
     ok(true, 'can load a video');
     start();
-
-    player.play();
   });
 
-  player.once('play', function(player) {
-    console.log('play');
+  player1.once('play', function(player1) {
     ok(true, 'can play a video');
     start();
     setTimeout(function() {
-      player.pause();
+      player1.pause();
     }, 3000);
   });
 
-  player.once('pause', function(player) {
-    console.log('pause');
+  player1.once('pause', function(player1) {
     ok(true, 'can pause a video');
     start();
+
+    player1.once('pause', function() {
+      ok(true, 'catch pause event on video end');
+      start();
+    });
+
     setTimeout(function() {
-      player.play();
+      player1.play();
     }, 1000);
   });
 
-  player.once('ended', function() {
-    console.log('ended');
+  player1.once('ended', function() {
     ok(true, 'emit ended event after video playback');
     start();
+
+    player2.load(testVideoId);
   });
+
+  player2.once('loadstart', function() {
+    ok(true, 'player2 should start loading after player1');
+    start();
+  });
+  player2.on('play', function() {
+    ok(false, 'player2 should not play');
+    start();
+  });
+  player2.on('pause', function() {
+    ok(false, 'player2 should not play');
+    start();
+  });
+
+  // -- Logging for debugging --
+  // player1.on('init', log('init'));
+  // player1.on('loadstart', log('loadstart'));
+  // player1.on('play', log('play'));
+  // player1.on('pause', log('pause'));
+  // player1.on('ended', log('ended'));
+  // player2.on('init', log('init'));
+  // player2.on('loadstart', log('loadstart'));
+  // player2.on('play', log('play'));
+  // player2.on('pause', log('pause'));
+  // player2.on('ended', log('ended'));
+  // function log(event) { return function() { console.log(event); }; }
 });
-
-// module('Readable Player Properties');
-// test('Player has a readable volume attribute');
-// test('Player has a readable muted attribute');
-// test('Player has a readable controls attribute');
-// test('Player has a readable loop attribute');
-// test('Player has a readable autoplay attribute');
-
-// module('Writable Player Properties');
-// test('Player has a writable volume attribute');
-// test('Player has a writable muted attribute');
-
-// module('Readable Video Properties');
-// test('Player has a readable currentTime attribute');
-// test('Player has a readable duration attribute');
-// test('Player has a readable paused attribute');
-
-// module('Writeable Video Properties');
-// test('Player has a writable currentTime attribute');
-
-// module('Player Events');
-// test('Player emits a loadStart event');
-// test('Player emits a progress event');
-// test('Player emits a error event');
-// test('Player emits a playing event');
-// test('Player emits a ended event');
-// test('Player emits a play event');
-// test('Player emits a pause event');

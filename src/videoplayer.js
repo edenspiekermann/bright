@@ -15,6 +15,7 @@ var playerPrototype = {
       init: bind(this.emit, this, 'init', this),
       play: bind(this.emit, this, 'play', this),
       pause: bind(this.emit, this, 'pause', this),
+      loadstart: bind(this.emit, this, 'loadstart', this),
       ended: bind(this.emit, this, 'ended', this)
     };
 
@@ -23,15 +24,19 @@ var playerPrototype = {
   },
 
   load: function(videoId) {
+    if (typeof videoId === 'undefined') throw new Error('missing video id');
     this._service.load(videoId, bind(this.emit, this, 'loadstart', this));
+    return this;
   },
 
   play: function() {
-    this._service.play();
+    this._service.play(bind(this.emit, this, 'play', this));
+    return this;
   },
 
   pause: function() {
-    this._service.pause();
+    this._service.pause(bind(this.emit, this, 'pause', this));
+    return this;
   }
 
 };

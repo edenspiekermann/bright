@@ -61,6 +61,7 @@
 	      init: bind(this.emit, this, 'init', this),
 	      play: bind(this.emit, this, 'play', this),
 	      pause: bind(this.emit, this, 'pause', this),
+	      loadstart: bind(this.emit, this, 'loadstart', this),
 	      ended: bind(this.emit, this, 'ended', this)
 	    };
 
@@ -69,15 +70,19 @@
 	  },
 
 	  load: function(videoId) {
+	    if (typeof videoId === 'undefined') throw new Error('missing video id');
 	    this._service.load(videoId, bind(this.emit, this, 'loadstart', this));
+	    return this;
 	  },
 
 	  play: function() {
-	    this._service.play();
+	    this._service.play(bind(this.emit, this, 'play', this));
+	    return this;
 	  },
 
 	  pause: function() {
-	    this._service.pause();
+	    this._service.pause(bind(this.emit, this, 'pause', this));
+	    return this;
 	  }
 
 	};
@@ -110,7 +115,7 @@
 	    templateReadyHandler: 'brightcove.__videoplayerReady'
 	  },
 
-	  init: function(element, options, callbacks) {
+	  init: function(element, options, emit) {
 	    options = assign(this.defaults, options);
 
 	    this.id = 'brightcove'+getUniqueId();
@@ -123,24 +128,33 @@
 	      this.player = this.api.getModule(window.brightcove.api.modules.APIModules.VIDEO_PLAYER);
 	    }, this);
 	    readyHandlers[this.id] = bind(function() {
-	      this.player.addEventListener(window.brightcove.api.events.MediaEvent.PLAY, callbacks.play);
-	      this.player.addEventListener(window.brightcove.api.events.MediaEvent.STOP, callbacks.pause);
-	      this.player.addEventListener(window.brightcove.api.events.MediaEvent.COMPLETE, callbacks.ended);
-	      callbacks.init();
+	      this.player.addEventListener(window.brightcove.api.events.MediaEvent.PLAY, emit.play);
+	      this.player.addEventListener(window.brightcove.api.events.MediaEvent.STOP, emit.pause);
+	      this.player.addEventListener(window.brightcove.api.events.MediaEvent.COMPLETE, emit.ended);
+	      emit.init();
+	      this._isReady = true;
+	      if (this._loadedVideo) this.load(this._loadedVideo, emit.loadstart);
+	      if (this._shouldPlay) setTimeout(bind(this.play,this), 500);
 	    }, this);
 
 	    window.brightcove.createExperience(object, object);
 	  },
 
-	  load: function(id, triggerLoadStart) {
-	    this.player.cueVideoByID(id);
-	    setTimeout(function() {
-	      triggerLoadStart();
-	    }, 300);
+	  load: function(videoId, emitLoadstart) {
+	    this._loadedVideo = videoId;
+	    if (!this._isReady) return;
+	    this.player.cueVideoByID(videoId);
+	    delete this._loadedVideo;
+	    emitLoadstart();
 	  },
 
 	  play: function() {
+	    if (!this._isReady) {
+	      this._shouldPlay = true;
+	      return;
+	    }
 	    this.player.play();
+	    delete this._shouldPlay;
 	  },
 
 	  pause: function() {
