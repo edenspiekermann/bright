@@ -173,13 +173,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	})();
 
-	var readyHandlers = {};
-	var loadHandlers = {};
-
 	function loadHandler() {
 	  this.api = window.brightcove.api.getExperience(this.id);
 	  this.player = this.api.getModule(window.brightcove.api.modules.APIModules.VIDEO_PLAYER);
 	}
+
 	function readyHandler() {
 	  this.player.addEventListener(window.brightcove.api.events.MediaEvent.PLAY, this.emit.play);
 	  this.player.addEventListener(window.brightcove.api.events.MediaEvent.STOP, this.emit.pause);
@@ -189,17 +187,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (this._loadedVideo) this.load(this._loadedVideo, this.emit.loadstart);
 	  if (this._shouldPlay) setTimeout(bind(this.play,this), 500);
 	}
-
-	window.brightcove.__videoplayerReady = (function() {
-	  return function(event) {
-	    readyHandlers[event.target.experience.id]();
-	  };
-	})();
-	window.brightcove.__videoplayerLoad = (function() {
-	  return function(id) {
-	    loadHandlers[id]();
-	  };
-	})();
 
 	function createObjectTag(element, options) {
 	  var object = document.createElement('object');
@@ -220,6 +207,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	function brightcoveFactory() {
 	  return Object.create(brightcove);
 	}
+
+	var readyHandlers = {};
+	window.brightcove.__videoplayerReady = (function() {
+	  return function(event) {
+	    readyHandlers[event.target.experience.id]();
+	  };
+	})();
+
+	var loadHandlers = {};
+	window.brightcove.__videoplayerLoad = (function() {
+	  return function(id) {
+	    loadHandlers[id]();
+	  };
+	})();
 
 	module.exports = brightcoveFactory;
 
