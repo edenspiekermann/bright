@@ -27,8 +27,29 @@ __Required:__ `//admin.brightcove.com/js/BrightcoveExperiences.js` has to be loa
 
 The source files are built by webpack to the UMD format. This means you can require `dist/videoplayer.js` via webpack, browserify or require.js. Although it’s not recommended you can also include `dist/videoplayer.min.js` in your html. This creates a global variable called `videoplayer`.
 
+Common.js
 ```js
-var videoplayer = require('videoplayer'); // common.js
+var videoplayer = require('videoplayer'); // installed via npm
+var videoplayer = require('./path_to/videoplayer.js'); // use the one in the dist folder
+
+var player = videoplayer(domElement, options);
+```
+
+Require.js
+```js
+require(['videoplayer'], function(videoplayer) {
+  var player = videoplayer(domElement, options);
+});
+```
+
+Global Variable
+```html
+<script src="//admin.brightcove.com/js/BrightcoveExperiences.js"></script>
+<script src="videoplayer.min.js"></script>
+<script src="main.js">
+```
+```js
+var player = videoplayer(domElement, options);
 ```
 
 
