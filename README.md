@@ -42,6 +42,8 @@ _Global Variable_
 var player = videoplayer(domElement, options);
 ```
 
+___Note:___ If you want to use brightcove make sure to [add its script](#brightcove) first.
+
 
 ## API
 
