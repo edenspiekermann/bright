@@ -3,11 +3,6 @@
 This abstraction wraps any video service with the official HTML5 Media and Media Events API. It does not always have a complete feature parity, due to the lack of some features the video servies don’t provide. An example of the HTML5 Media API can be found [http://www.w3.org/2010/05/video/mediaevents.html](here).
 
 
-## Brightcove
-
-Brightcove is the default video provider and currently built into the library itself, as it was built solely as an abstraction for Brightcove in the first place. During development it became clear that it could easily be extended, so it was rewritten in a more generic approach. The tight coupling with brightcove may be removed in future versions.
-
-
 ## Installation
 
 Until the library is published on `npm` you can install it via the github url scheme.
@@ -19,15 +14,9 @@ npm install edenspiekermann/brightcove-wrapper --save
 
 ## Usage
 
-__Required:__ `//admin.brightcove.com/js/BrightcoveExperiences.js` has to be loaded before the first usage of videoplayer.js. Use your favorite script loader or simply add a `script` tag before your main js file:
-```html
-<script src="//admin.brightcove.com/js/BrightcoveExperiences.js"></script>
-<script src="main.js"></script>
-```
-
 The source files are built by webpack to the UMD format. This means you can require `dist/videoplayer.js` via webpack, browserify or require.js. Although it’s not recommended you can also include `dist/videoplayer.min.js` in your html. This creates a global variable called `videoplayer`.
 
-Common.js
+_Common.js_
 ```js
 var videoplayer = require('videoplayer'); // installed via npm
 var videoplayer = require('./path_to/videoplayer.js'); // use the one in the dist folder
@@ -35,14 +24,14 @@ var videoplayer = require('./path_to/videoplayer.js'); // use the one in the dis
 var player = videoplayer(domElement, options);
 ```
 
-Require.js
+_Require.js_
 ```js
 require(['videoplayer'], function(videoplayer) {
   var player = videoplayer(domElement, options);
 });
 ```
 
-Global Variable
+_Global Variable_
 ```html
 <script src="//admin.brightcove.com/js/BrightcoveExperiences.js"></script>
 <script src="videoplayer.min.js"></script>
@@ -82,6 +71,17 @@ player.pause();
 chaining
 ```js
 var player = videoplayer(domElement, options).load(videoId).play();
+```
+
+
+## Brightcove
+
+Brightcove is the default video provider and currently built into the library itself, as it was built solely as an abstraction for Brightcove in the first place. During development it became clear that it could easily be extended, so it was rewritten in a more generic approach. The tight coupling with brightcove may be removed in future versions.
+
+__Required:__ `//admin.brightcove.com/js/BrightcoveExperiences.js` has to be loaded before the first usage of videoplayer.js. Use your favorite script loader or simply add a `script` tag before your main js file:
+```html
+<script src="//admin.brightcove.com/js/BrightcoveExperiences.js"></script>
+<script src="main.js"></script>
 ```
 
 
