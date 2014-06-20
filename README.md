@@ -67,22 +67,22 @@ player.on('ended', function(player) {
 });
 ```
 
-Possible options for brightcove can be found at [this page](http://support.brightcove.com/de/video-cloud/dokumente/player-konfigurationsparameter#supported) from the official documentation.
+Possible __options__ for brightcove can be found at [this page](http://support.brightcove.com/de/video-cloud/dokumente/player-konfigurationsparameter#supported) from the official documentation.
 
-Event methods are copied from [component/emitter](https://github.com/component/emitter):
+Currently supported __events__:
+- init
+- loadstart
+- play
+- pause
+- ended
+
+__event methods__ are copied from [component/emitter](https://github.com/component/emitter):
 - on(event, fn)
 - once(event, fn)
 - off(event, fn)
 - emit(event, …)
 - listeners(event)
 - hasListeners(event)
-
-Currently supported events:
-- init
-- loadstart
-- play
-- pause
-- ended
 
 
 ## Testing
