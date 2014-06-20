@@ -147,7 +147,7 @@ test('Wrong Usage', function() {
   }, 'you have to pass a videoId to load');
 });
 
-test('CSS', function() {
+test('display: none', function() {
   expect(1);
   stop();
 
@@ -162,6 +162,38 @@ test('CSS', function() {
 
   setTimeout(function() {
     wrapper.style.cssText = "display:none";
+
+    setTimeout(function() {
+      wrapper.style.cssText = "";
+
+      player.init();
+
+      player.once('loadstart', function() {
+        ok(true, 'player can be reinitialized after it was hidden via CSS');
+        start();
+      });
+    }, 2000);
+  }, 2000);
+
+  player.on('init', log('init'));
+  player.on('loadstart', log('loadstart'));
+});
+
+test('visibility: hidden', function() {
+  expect(1);
+  stop();
+
+  var element = document.getElementById('player1');
+  var wrapper = document.getElementById('qunit-fixture');
+
+  var player = videoplayer(element, {
+    playerKey: testData.brightcovePlayerKey
+  });
+
+  player.load(testData.brightcoveVideoId);
+
+  setTimeout(function() {
+    wrapper.style.cssText = "visibility:hidden";
 
     setTimeout(function() {
       wrapper.style.cssText = "";
