@@ -115,7 +115,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._shouldPlay = true;
 	      return;
 	    }
-	    this._brightcove.player.play();
+	    this._brightcove.player.loadVideoById(this._videoId);
 	    delete this._shouldPlay;
 
 	    return this;
