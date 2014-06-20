@@ -1,6 +1,6 @@
 # bright
 
-This abstraction wraps the brightcove smart player api with an easy to use interface. bright’s API follows the naming conventions of the official HTML5 Media and Media Events API. An example of the full standard can be found at http://www.w3.org/2010/05/video/mediaevents.html.
+This abstraction wraps the [brightcove smart player api](http://docs.brightcove.com/en/video-cloud/smart-player-api/references/) with an easy to use interface. bright’s API follows the naming conventions of the official HTML5 Media and Media Events API. An example of the full standard can be found at http://www.w3.org/2010/05/video/mediaevents.html.
 
 
 ## Installation
@@ -66,6 +66,8 @@ player.on('ended', function(player) {
   player.load(nextVideoID);
 });
 ```
+
+Possible options for brightcove can be found at [this page](http://support.brightcove.com/de/video-cloud/dokumente/player-konfigurationsparameter#supported) from the official documentation.
 
 Event methods are copied from [component/emitter](https://github.com/component/emitter):
 - on(event, fn)
