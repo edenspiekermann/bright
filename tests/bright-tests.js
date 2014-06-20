@@ -10,9 +10,9 @@ function log(event) {
   };
 }
 
-module('Initialization');
+module('API');
 
-test('Brightcove (default video service)', function() {
+test('Initialization', function() {
   expect(2);
   stop(2);
 
@@ -35,8 +35,6 @@ test('Brightcove (default video service)', function() {
     start();
   });
 });
-
-module('API');
 
 test('Player', function() {
   expect(6);
