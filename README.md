@@ -55,13 +55,14 @@ var brightcovePlayer = videoplayer(domElement, options);
 
 player.load(videoId);
 player.play();
+player.play(videoId); // loads and plays video
 player.pause();
 
-// you may chain methods
+// chaining
 player.load(videoId).play();
 
-// or use play directly
-player.play(videoId);
+// reinitialize player after it was hidden via CSS
+player.init();
 
 // events
 player.on('ended', function(player) {
