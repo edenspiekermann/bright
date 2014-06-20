@@ -85,7 +85,7 @@ Currently supported events:
 
 ## Brightcove
 
-__Required:__ `//admin.brightcove.com/js/BrightcoveExperiences.js` has to be loaded before the first usage of videoplayer.js. Use your favorite script loader or simply add a `script` tag before your main js file:
+__Required:__ `//admin.brightcove.com/js/BrightcoveExperiences.js` has to be loaded before the first usage of bright.js. Use your favorite script loader or simply add a `script` tag before your main js file:
 ```html
 <script src="//admin.brightcove.com/js/BrightcoveExperiences.js"></script>
 <script src="main.js"></script>
@@ -98,7 +98,7 @@ Video and player id for testing are taken from [brightcoves example page](http:/
 
 1. Clone the repository
 2. `npm install`
-3. `npm start` to watch for file changes in `src/videoplayer.js`
+3. `npm start` to watch for file changes in `src/bright.js`
 4. make changes
 5. `npm test` starts a local server & opens your default browser with `http://localhost:8000/tests`
 6. `npm run build` if all tests pass
