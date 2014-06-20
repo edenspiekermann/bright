@@ -63,9 +63,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	var playerPrototype = {
 
 	  init: function(element, options, videoService) {
-	    this.element = element;
-	    this.options = assign({}, options);
-	    this._service = (videoService) ? videoService() : defaultVideoService();
+	    this.element = element || this.element;
+	    this.options = assign({}, options || this.options);
+	    if (arguments.length) this._service = (videoService) ? videoService() : defaultVideoService();
 
 	    var events = {
 	      init: bind(this.emit, this, 'init', this),
@@ -96,6 +96,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	};
+
+	if (typeof Object.create != 'function') {
+	  (function () {
+	    var F = function () {};
+	    Object.create = function (o) {
+	      if (arguments.length > 1) {
+	        throw Error('Second argument not supported');
+	      }
+	      if (o === null) {
+	        throw Error('Cannot set a null [[Prototype]]');
+	      }
+	      if (typeof o != 'object') {
+	        throw TypeError('Argument must be an object');
+	      }
+	      F.prototype = o;
+	      return new F();
+	    };
+	  })();
+	}
 
 	function playerFactory() {
 	  var player = Object.create(playerPrototype);
@@ -130,7 +149,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.options = assign(this.defaults, options);
 	    this.emit = emit;
 
-	    this.id = 'brightcove'+getUniqueId();
+	    this.id = this.id || 'brightcove'+getUniqueId();
 	    var object = createObjectTag(this.element, this.options);
 	    object.id = this.id;
 	    this.element.innerHTML = '';
@@ -146,7 +165,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._loadedVideo = videoId;
 	    if (!this._isReady) return;
 	    this.player.cueVideoByID(videoId);
-	    delete this._loadedVideo;
 	    this.emit.loadstart();
 	  },
 
