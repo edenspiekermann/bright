@@ -177,7 +177,4 @@ test('CSS', function() {
 
   player.on('init', log('init'));
   player.on('loadstart', log('loadstart'));
-  player.on('play', log('play'));
-  player.on('pause', log('pause'));
-  player.on('ended', log('ended'));
 });
