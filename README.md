@@ -42,7 +42,7 @@ _Global Variable_
 var player = bright(domElement, options);
 ```
 
-___Note:___ Make sure to [add brightcove’s script](#brightcove) first.
+___Note:___ `//admin.brightcove.com/js/BrightcoveExperiences.js` has to be loaded __before__ `bright.js`. Use your favorite script loader or simply add a `script` tag before your main js file.
 
 
 ## API
@@ -83,16 +83,9 @@ Currently supported events:
 - ended
 
 
-## Brightcove
+## Testing
 
-`//admin.brightcove.com/js/BrightcoveExperiences.js` has to be loaded __before__ `bright.js`. Use your favorite script loader or simply add a `script` tag before your main js file:
-
-```html
-<script src="//admin.brightcove.com/js/BrightcoveExperiences.js"></script>
-<script src="main.js"></script>
-```
-
-Video and player id for testing are taken from [brightcoves example page](http://files.brightcove.com/content.html). You may have to update them if they change.
+Video and player id for testing are taken from [brightcove’s example page](http://files.brightcove.com/content.html). You may have to update them if they change.
 
 
 ## Development
