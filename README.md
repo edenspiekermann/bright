@@ -85,7 +85,8 @@ Currently supported events:
 
 ## Brightcove
 
-__Required:__ `//admin.brightcove.com/js/BrightcoveExperiences.js` has to be loaded before the first usage of bright.js. Use your favorite script loader or simply add a `script` tag before your main js file:
+`//admin.brightcove.com/js/BrightcoveExperiences.js` has to be loaded __before__ the first usage of `bright.js`. Use your favorite script loader or simply add a `script` tag before your main js file:
+
 ```html
 <script src="//admin.brightcove.com/js/BrightcoveExperiences.js"></script>
 <script src="main.js"></script>
