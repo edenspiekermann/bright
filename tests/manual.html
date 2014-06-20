@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>videoplayer Specs</title>
-  <meta name="description" content="testrunner for videoplayer">
+  <title>bright tests</title>
+  <meta name="description" content="testrunner for bright">
   <meta name="author" content="Edenspiekermann">
 </head>
 <body>
@@ -12,7 +12,7 @@
   <button id="play">play</button>
   <button id="pause">pause</button>
   <script src="//admin.brightcove.com/js/BrightcoveExperiences.js"></script>
-  <script src="../dist/videoplayer.js"></script>
+  <script src="../dist/bright.js"></script>
   <script>
   var testData = {
     brightcoveVideoId: 1926945850001,
@@ -25,7 +25,7 @@
   var pauseButtonElement = document.getElementById('pause');
 
   var options = { playerKey: testData.brightcovePlayerKey };
-  var player = videoplayer(playerElement, options);
+  var player = bright(playerElement, options);
 
   loadButtonElement.onclick = function() {
     player.load(testData.brightcoveVideoId);

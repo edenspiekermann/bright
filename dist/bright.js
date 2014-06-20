@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define(factory);
 	else if(typeof exports === 'object')
-		exports["videoplayer"] = factory();
+		exports["bright"] = factory();
 	else
-		root["videoplayer"] = factory();
+		root["bright"] = factory();
 })(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -54,85 +54,15 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var assign = __webpack_require__(3);
-	var bind = __webpack_require__(4);
-	var emitter = __webpack_require__(2);
+	var assign = __webpack_require__(5);
+	var bind = __webpack_require__(6);
+	var emitter = __webpack_require__(4);
 
-	var defaultVideoService = __webpack_require__(1);
+	var getUniqueId = __webpack_require__(1);
+	var createObjectTag = __webpack_require__(2);
+	var handlers = __webpack_require__(3);
 
-	var playerPrototype = {
-
-	  init: function(element, options, videoService) {
-	    this.element = element || this.element;
-	    this.options = assign({}, options || this.options);
-	    if (arguments.length) this._service = (videoService) ? videoService() : defaultVideoService();
-
-	    var events = {
-	      init: bind(this.emit, this, 'init', this),
-	      play: bind(this.emit, this, 'play', this),
-	      pause: bind(this.emit, this, 'pause', this),
-	      loadstart: bind(this.emit, this, 'loadstart', this),
-	      ended: bind(this.emit, this, 'ended', this)
-	    };
-
-	    this._service.init(this.element, this.options, events);
-	    return this;
-	  },
-
-	  load: function(videoId) {
-	    if (!videoId) throw new Error('missing video id');
-	    this._service.load(videoId);
-	    return this;
-	  },
-
-	  play: function(videoId) {
-	    this._service.play(videoId);
-	    return this;
-	  },
-
-	  pause: function() {
-	    this._service.pause();
-	    return this;
-	  }
-
-	};
-
-	if (typeof Object.create != 'function') {
-	  (function () {
-	    var F = function () {};
-	    Object.create = function (o) {
-	      if (arguments.length > 1) {
-	        throw Error('Second argument not supported');
-	      }
-	      if (o === null) {
-	        throw Error('Cannot set a null [[Prototype]]');
-	      }
-	      if (typeof o != 'object') {
-	        throw TypeError('Argument must be an object');
-	      }
-	      F.prototype = o;
-	      return new F();
-	    };
-	  })();
-	}
-
-	function playerFactory() {
-	  var player = Object.create(playerPrototype);
-	  player = emitter(player);
-	  return player.init.apply(player, arguments);
-	}
-
-	module.exports = playerFactory;
-
-
-/***/ },
-/* 1 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var assign = __webpack_require__(3);
-	var bind = __webpack_require__(4);
-
-	var brightcove = {
+	var bright = {
 
 	  defaults: {
 	    isVid: true,
@@ -144,107 +74,145 @@ return /******/ (function(modules) { // webpackBootstrap
 	    templateReadyHandler: 'brightcove.__videoplayerReady'
 	  },
 
-	  init: function(element, options, emit) {
-	    this.element = element;
-	    this.options = assign(this.defaults, options);
-	    this.emit = emit;
+	  init: function(element, options) {
+	    this._element = element || this._element;
+	    this._options = assign({}, this.defaults, options || this._options);
+	    this._id = this._id || 'brightcove'+getUniqueId();
 
-	    this.id = this.id || 'brightcove'+getUniqueId();
-	    var object = createObjectTag(this.element, this.options);
-	    object.id = this.id;
-	    this.element.innerHTML = '';
-	    this.element.appendChild(object);
+	    var object = createObjectTag(this._options);
+	    object.id = this._id;
+	    this._element.innerHTML = '';
+	    this._element.appendChild(object);
 
-	    loadHandlers[this.id] = bind(loadHandler, this);
-	    readyHandlers[this.id] = bind(readyHandler, this);
+	    handlers.loadHandlers[this._id] = bind(handlers.load, this);
+	    handlers.readyHandlers[this._id] = bind(handlers.ready, this, bind(onReady,this));
+
+	    function onReady() {
+	      this._isReady = true;
+	      if (this._videoId) this.load(this._videoId, bind(this.emit, this, 'loadstart', this));
+	      if (this._shouldPlay) setTimeout(bind(this.play,this), 500);
+	    }
 
 	    window.brightcove.createExperience(object, object);
+
+	    return this;
 	  },
 
 	  load: function(videoId) {
-	    this._loadedVideo = videoId;
+	    if (!videoId) throw new Error('missing video id');
+
+	    this._videoId = videoId;
 	    if (!this._isReady) return;
-	    this.player.cueVideoByID(videoId);
-	    this.emit.loadstart();
+	    this._brightcove.player.cueVideoByID(videoId);
+	    this.emit('loadstart', this);
+
+	    return this;
 	  },
 
 	  play: function(videoId) {
 	    if (!this._isReady) {
-	      if (videoId) this._loadedVideo = videoId;
+	      if (videoId) this._videoId = videoId;
 	      this._shouldPlay = true;
 	      return;
 	    }
-	    this.player.play();
+	    this._brightcove.player.play();
 	    delete this._shouldPlay;
+
+	    return this;
 	  },
 
 	  pause: function() {
-	    this.player.pause();
+	    this._brightcove.player.pause();
+	    return this;
 	  }
 
 	};
 
-	var getUniqueId = (function() {
-	  var id = 0;
-	  return function() {
-	    return id++;
-	  };
-	})();
+	var brightWithEvents = emitter(bright);
 
-	function loadHandler() {
-	  this.api = window.brightcove.api.getExperience(this.id);
-	  this.player = this.api.getModule(window.brightcove.api.modules.APIModules.VIDEO_PLAYER);
+	function playerFactory() {
+	  var player = Object.create(brightWithEvents);
+	  return player.init.apply(player, arguments);
 	}
 
-	function readyHandler() {
-	  this.player.addEventListener(window.brightcove.api.events.MediaEvent.PLAY, this.emit.play);
-	  this.player.addEventListener(window.brightcove.api.events.MediaEvent.STOP, this.emit.pause);
-	  this.player.addEventListener(window.brightcove.api.events.MediaEvent.COMPLETE, this.emit.ended);
-	  this.emit.init();
-	  this._isReady = true;
-	  if (this._loadedVideo) this.load(this._loadedVideo, this.emit.loadstart);
-	  if (this._shouldPlay) setTimeout(bind(this.play,this), 500);
-	}
+	module.exports = playerFactory;
 
-	function createObjectTag(element, options) {
+
+/***/ },
+/* 1 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var id = 0;
+
+	module.exports = function() {
+	  return id++;
+	};
+
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	function createObjectTag(options) {
 	  var object = document.createElement('object');
 	  object.className = "BrightcoveExperience";
 	  for (var param in options) {
 	    object.appendChild(createParam(param, options[param]));
 	  }
 	  return object;
-
-	  function createParam(name, value) {
-	    var param = document.createElement('param');
-	    param.name = name;
-	    param.value = value;
-	    return param;
-	  }
 	}
 
-	function brightcoveFactory() {
-	  return Object.create(brightcove);
+	function createParam(name, value) {
+	  var param = document.createElement('param');
+	  param.name = name;
+	  param.value = value;
+	  return param;
 	}
 
-	var readyHandlers = {};
-	window.brightcove.__videoplayerReady = (function() {
-	  return function(event) {
-	    readyHandlers[event.target.experience.id]();
-	  };
-	})();
-
-	var loadHandlers = {};
-	window.brightcove.__videoplayerLoad = (function() {
-	  return function(id) {
-	    loadHandlers[id]();
-	  };
-	})();
-
-	module.exports = brightcoveFactory;
+	module.exports = createObjectTag;
 
 
 /***/ },
-/* 2 */
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var bind = __webpack_require__(6);
+
+	var handlers = {
+
+	  readyHandlers: {},
+	  loadHandlers: {},
+
+	  load: function() {
+	    var brightcoveAPI = window.brightcove.api;
+	    this._brightcove = {};
+	    this._brightcove.experience = brightcoveAPI.getExperience(this._id);
+	    this._brightcove.player = this._brightcove.experience.getModule(brightcoveAPI.modules.APIModules.VIDEO_PLAYER);
+	  },
+
+	  ready: function(onReady) {
+	    this._brightcove.player.addEventListener(window.brightcove.api.events.MediaEvent.PLAY, bind(this.emit, this, 'play', this));
+	    this._brightcove.player.addEventListener(window.brightcove.api.events.MediaEvent.STOP, bind(this.emit, this, 'pause', this));
+	    this._brightcove.player.addEventListener(window.brightcove.api.events.MediaEvent.COMPLETE, bind(this.emit, this, 'ended', this));
+	    this.emit('init', this);
+	    onReady();
+	  }
+
+	};
+
+	window.brightcove.__videoplayerReady = function(event) {
+	  handlers.readyHandlers[event.target.experience.id]();
+	};
+
+	window.brightcove.__videoplayerLoad = function(id) {
+	  handlers.loadHandlers[id]();
+	};
+
+	module.exports = handlers;
+
+
+/***/ },
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -414,7 +382,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 3 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -425,9 +393,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var baseCreateCallback = __webpack_require__(6),
-	    keys = __webpack_require__(5),
-	    objectTypes = __webpack_require__(7);
+	var baseCreateCallback = __webpack_require__(8),
+	    keys = __webpack_require__(7),
+	    objectTypes = __webpack_require__(9);
 
 	/**
 	 * Assigns own enumerable properties of source object(s) to the destination
@@ -490,7 +458,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 4 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -501,8 +469,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var createWrapper = __webpack_require__(8),
-	    slice = __webpack_require__(9);
+	var createWrapper = __webpack_require__(10),
+	    slice = __webpack_require__(11);
 
 	/**
 	 * Creates a function that, when called, invokes `func` with the `this`
@@ -536,7 +504,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 5 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -547,9 +515,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var isNative = __webpack_require__(10),
-	    isObject = __webpack_require__(11),
-	    shimKeys = __webpack_require__(12);
+	var isNative = __webpack_require__(12),
+	    isObject = __webpack_require__(13),
+	    shimKeys = __webpack_require__(14);
 
 	/* Native method shortcuts for methods with the same name as other `lodash` methods */
 	var nativeKeys = isNative(nativeKeys = Object.keys) && nativeKeys;
@@ -578,7 +546,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 6 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -589,10 +557,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var bind = __webpack_require__(4),
-	    identity = __webpack_require__(18),
-	    setBindData = __webpack_require__(13),
-	    support = __webpack_require__(14);
+	var bind = __webpack_require__(6),
+	    identity = __webpack_require__(20),
+	    setBindData = __webpack_require__(15),
+	    support = __webpack_require__(16);
 
 	/** Used to detected named functions */
 	var reFuncName = /^\s*function[ \n\r\t]+\w/;
@@ -664,7 +632,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 7 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -690,7 +658,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 8 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -701,10 +669,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var baseBind = __webpack_require__(15),
-	    baseCreateWrapper = __webpack_require__(16),
-	    isFunction = __webpack_require__(17),
-	    slice = __webpack_require__(9);
+	var baseBind = __webpack_require__(17),
+	    baseCreateWrapper = __webpack_require__(18),
+	    isFunction = __webpack_require__(19),
+	    slice = __webpack_require__(11);
 
 	/**
 	 * Used for `Array` method references.
@@ -802,7 +770,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 9 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -846,7 +814,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 10 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -886,7 +854,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 11 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -897,7 +865,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var objectTypes = __webpack_require__(7);
+	var objectTypes = __webpack_require__(9);
 
 	/**
 	 * Checks if `value` is the language type of Object.
@@ -931,7 +899,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 12 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -942,7 +910,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var objectTypes = __webpack_require__(7);
+	var objectTypes = __webpack_require__(9);
 
 	/** Used for native method references */
 	var objectProto = Object.prototype;
@@ -975,7 +943,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 13 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -986,8 +954,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var isNative = __webpack_require__(10),
-	    noop = __webpack_require__(19);
+	var isNative = __webpack_require__(12),
+	    noop = __webpack_require__(21);
 
 	/** Used as the property descriptor for `__bindData__` */
 	var descriptor = {
@@ -1024,7 +992,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 14 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -1035,7 +1003,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var isNative = __webpack_require__(10);
+	var isNative = __webpack_require__(12);
 
 	/** Used to detect functions containing a `this` reference */
 	var reThis = /\bthis\b/;
@@ -1071,7 +1039,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 15 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -1082,10 +1050,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var baseCreate = __webpack_require__(20),
-	    isObject = __webpack_require__(11),
-	    setBindData = __webpack_require__(13),
-	    slice = __webpack_require__(9);
+	var baseCreate = __webpack_require__(22),
+	    isObject = __webpack_require__(13),
+	    setBindData = __webpack_require__(15),
+	    slice = __webpack_require__(11);
 
 	/**
 	 * Used for `Array` method references.
@@ -1139,7 +1107,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 16 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -1150,10 +1118,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var baseCreate = __webpack_require__(20),
-	    isObject = __webpack_require__(11),
-	    setBindData = __webpack_require__(13),
-	    slice = __webpack_require__(9);
+	var baseCreate = __webpack_require__(22),
+	    isObject = __webpack_require__(13),
+	    setBindData = __webpack_require__(15),
+	    slice = __webpack_require__(11);
 
 	/**
 	 * Used for `Array` method references.
@@ -1223,7 +1191,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 17 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -1256,7 +1224,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 18 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -1290,7 +1258,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 19 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -1322,7 +1290,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 20 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -1333,9 +1301,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var isNative = __webpack_require__(10),
-	    isObject = __webpack_require__(11),
-	    noop = __webpack_require__(19);
+	var isNative = __webpack_require__(12),
+	    isObject = __webpack_require__(13),
+	    noop = __webpack_require__(21);
 
 	/* Native method shortcuts for methods with the same name as other `lodash` methods */
 	var nativeCreate = isNative(nativeCreate = Object.create) && nativeCreate;

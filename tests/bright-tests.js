@@ -1,4 +1,4 @@
-/* global videoplayer, test, expect, ok, stop, start, throws */
+/* global bright, test, expect, ok, stop, start, throws */
 
 var testData = {
   brightcoveVideoId: 1926945850001,
@@ -19,10 +19,10 @@ test('Brightcove (default video service)', function() {
   var element1 = document.getElementById('player1');
   var element2 = document.getElementById('player2');
 
-  var player1 = videoplayer(element1, {
+  var player1 = bright(element1, {
     playerKey: testData.brightcovePlayerKey
   });
-  var player2 = videoplayer(element2, {
+  var player2 = bright(element2, {
     playerKey: testData.brightcovePlayerKey
   });
 
@@ -45,10 +45,10 @@ test('Player', function() {
   var element1 = document.getElementById('player1');
   var element2 = document.getElementById('player2');
 
-  var player1 = videoplayer(element1, {
+  var player1 = bright(element1, {
     playerKey: testData.brightcovePlayerKey
   });
-  var player2 = videoplayer(element2, {
+  var player2 = bright(element2, {
     playerKey: testData.brightcovePlayerKey
   });
   player1.load(testData.brightcoveVideoId);
@@ -119,7 +119,7 @@ test('Player', function() {
 
   var element = document.getElementById('player1');
 
-  var player = videoplayer(element, {
+  var player = bright(element, {
     playerKey: testData.brightcovePlayerKey
   });
 
@@ -138,7 +138,7 @@ test('Wrong Usage', function() {
 
   var element = document.getElementById('player1');
 
-  var player = videoplayer(element, {
+  var player = bright(element, {
     playerKey: testData.brightcovePlayerKey
   });
 
@@ -154,7 +154,7 @@ test('display: none', function() {
   var element = document.getElementById('player1');
   var wrapper = document.getElementById('qunit-fixture');
 
-  var player = videoplayer(element, {
+  var player = bright(element, {
     playerKey: testData.brightcovePlayerKey
   });
 
@@ -186,7 +186,7 @@ test('visibility: hidden', function() {
   var element = document.getElementById('player1');
   var wrapper = document.getElementById('qunit-fixture');
 
-  var player = videoplayer(element, {
+  var player = bright(element, {
     playerKey: testData.brightcovePlayerKey
   });
 

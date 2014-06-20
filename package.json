@@ -1,16 +1,16 @@
 {
-  "name": "videoplayer",
+  "name": "bright",
   "version": "0.0.1",
-  "description": "easy videoplayer abstraction",
-  "main": "dist/videoplayer.js",
+  "description": "easy brightcove abstraction",
+  "main": "dist/bright.js",
   "directories": {
     "test": "tests"
   },
   "scripts": {
-    "start": "webpack src/videoplayer.js dist/videoplayer.js --watch --output-library videoplayer --output-library-target umd --progress --colors",
+    "start": "webpack src/bright.js dist/bright.js --watch --output-library bright --output-library-target umd --progress --colors",
     "build": "npm run build-dev; npm run build-min",
-    "build-dev": "webpack src/videoplayer.js dist/videoplayer.js --output-library videoplayer --output-library-target umd --progress --colors",
-    "build-min": "webpack src/videoplayer.js dist/videoplayer.min.js --optimize-minimize --output-library videoplayer --output-library-target umd --progress --colors",
+    "build-dev": "webpack src/bright.js dist/bright.js --output-library bright --output-library-target umd --progress --colors",
+    "build-min": "webpack src/bright.js dist/bright.min.js --optimize-minimize --output-library bright --output-library-target umd --progress --colors",
     "test": "open 'http://localhost:8000/tests' && python -m SimpleHTTPServer"
   },
   "author": "edenspiekermann",
