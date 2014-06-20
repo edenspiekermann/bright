@@ -18,7 +18,7 @@ var brightcove = {
     this.options = assign(this.defaults, options);
     this.emit = emit;
 
-    this.id = 'brightcove'+getUniqueId();
+    this.id = this.id || 'brightcove'+getUniqueId();
     var object = createObjectTag(this.element, this.options);
     object.id = this.id;
     this.element.innerHTML = '';
@@ -34,7 +34,6 @@ var brightcove = {
     this._loadedVideo = videoId;
     if (!this._isReady) return;
     this.player.cueVideoByID(videoId);
-    delete this._loadedVideo;
     this.emit.loadstart();
   },
 

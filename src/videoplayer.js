@@ -7,9 +7,9 @@ var defaultVideoService = require('./brightcove');
 var playerPrototype = {
 
   init: function(element, options, videoService) {
-    this.element = element;
-    this.options = assign({}, options);
-    this._service = (videoService) ? videoService() : defaultVideoService();
+    this.element = element || this.element;
+    this.options = assign({}, options || this.options);
+    if (arguments.length) this._service = (videoService) ? videoService() : defaultVideoService();
 
     var events = {
       init: bind(this.emit, this, 'init', this),
