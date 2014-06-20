@@ -16,7 +16,7 @@ npm install edenspiekermann/brightcove-wrapper --save
 
 The source files are built by webpack to the UMD format. This means you can require `dist/videoplayer.js` via webpack, browserify or require.js. Although it’s not recommended you can also include `dist/videoplayer.min.js` in your html. This creates a global variable called `videoplayer`.
 
-_Common.js_
+_Common.js (webpack, browserify…)_
 ```js
 var videoplayer = require('videoplayer'); // installed via npm
 var videoplayer = require('./path_to/videoplayer.js'); // use the one in the dist folder
@@ -87,7 +87,7 @@ Currently supported events:
 
 ## Brightcove
 
-Brightcove is the default video provider and currently built into the library itself, as it was built solely as an abstraction for Brightcove in the first place. During development it became clear that it could easily be extended, so it was rewritten in a more generic approach. The tight coupling with brightcove may be removed in future versions.
+Brightcove is the default video provider and currently built into the library itself, as it was built solely as an abstraction for Brightcove in the first place. During development it became clear that it could easily be extended, so it was rewritten in a more generic approach. Brightcove being included as the default video service may be removed in future versions.
 
 __Required:__ `//admin.brightcove.com/js/BrightcoveExperiences.js` has to be loaded before the first usage of videoplayer.js. Use your favorite script loader or simply add a `script` tag before your main js file:
 ```html
