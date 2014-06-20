@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>videoplayer Specs</title>
+  <meta name="description" content="testrunner for videoplayer">
+  <meta name="author" content="Edenspiekermann">
+</head>
+<body>
+  <div id="player"></div>
+  <button id="load">load</button>
+  <button id="play">play</button>
+  <button id="pause">pause</button>
+  <script src="//admin.brightcove.com/js/BrightcoveExperiences.js"></script>
+  <script src="../dist/videoplayer.js"></script>
+  <script>
+  var testData = {
+    brightcoveVideoId: 1926945850001,
+    brightcovePlayerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
+  };
+
+  var playerElement = document.getElementById('player');
+  var loadButtonElement = document.getElementById('load');
+  var playButtonElement = document.getElementById('play');
+  var pauseButtonElement = document.getElementById('pause');
+
+  var options = { playerKey: testData.brightcovePlayerKey };
+  var player = videoplayer(playerElement, options);
+
+  loadButtonElement.onclick = function() {
+    player.load(testData.brightcoveVideoId);
+  };
+  playButtonElement.onclick = function() {
+    player.play();
+  };
+  pauseButtonElement.onclick = function() {
+    player.pause();
+  };
+
+  player.on('init', log('init'));
+  player.on('loadstart', log('loadstart'));
+  player.on('play', log('play'));
+  player.on('pause', log('pause'));
+  player.on('ended', log('ended'));
+
+  function log(event) {
+    return function() {
+      if (typeof console !== "undefined") console.log(event);
+    };
+  }
+  </script>
+</body>
+</html>
