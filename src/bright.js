@@ -14,8 +14,8 @@ var bright = {
     includeAPI: true,
     wmode: 'transparent',
     bgcolor: '#ffffff',
-    templateLoadHandler: 'brightcove.__videoplayerLoad',
-    templateReadyHandler: 'brightcove.__videoplayerReady'
+    templateLoadHandler: 'brightcove.__brightLoad',
+    templateReadyHandler: 'brightcove.__brightReady'
   },
 
   init: function(element, options) {
@@ -34,7 +34,7 @@ var bright = {
     function onReady() {
       this._isReady = true;
       if (this._videoId) this.load(this._videoId, bind(this.emit, this, 'loadstart', this));
-      if (this._shouldPlay) setTimeout(bind(this.play,this), 500);
+      if (this._shouldPlay) setTimeout(bind(this.play,this,this._videoId), 500);
     }
 
     window.brightcove.createExperience(object, object);
@@ -46,7 +46,7 @@ var bright = {
     if (!videoId) throw new Error('missing video id');
 
     this._videoId = videoId;
-    if (!this._isReady) return;
+    if (!this._isReady) return this;
     this._brightcove.player.cueVideoByID(videoId);
     this.emit('loadstart', this);
 
@@ -54,13 +54,19 @@ var bright = {
   },
 
   play: function(videoId) {
+    if (videoId) this._videoId = videoId;
+
     if (!this._isReady) {
-      if (videoId) this._videoId = videoId;
       this._shouldPlay = true;
-      return;
+      return this;
     }
-    this._brightcove.player.loadVideoByID(this._videoId);
     delete this._shouldPlay;
+
+    if (videoId) {
+      this._brightcove.player.loadVideoByID(this._videoId);
+    } else {
+      this._brightcove.player.play();
+    }
 
     return this;
   },

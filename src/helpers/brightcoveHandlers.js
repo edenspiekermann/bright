@@ -22,11 +22,11 @@ var handlers = {
 
 };
 
-window.brightcove.__videoplayerReady = function(event) {
+window.brightcove.__brightReady = function(event) {
   handlers.readyHandlers[event.target.experience.id]();
 };
 
-window.brightcove.__videoplayerLoad = function(id) {
+window.brightcove.__brightLoad = function(id) {
   handlers.loadHandlers[id]();
 };
 
