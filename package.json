@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "description": "easy brightcove abstraction",
   "main": "dist/bright.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/edenspiekermann/brightcove-wrapper.git"
+  },
   "directories": {
     "test": "tests"
   },
