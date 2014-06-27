@@ -35,7 +35,7 @@ _Global Variable_
 ```html
 <script src="//admin.brightcove.com/js/BrightcoveExperiences.js"></script>
 <script src="bright.min.js"></script>
-<script src="main.js">
+<script src="your_scripts.js">
 ```
 ```js
 // main.js
@@ -47,7 +47,15 @@ ___Note:___ `//admin.brightcove.com/js/BrightcoveExperiences.js` has to be loade
 
 ## API
 
+Example HTML:
+```html
+<div id="player"></div>
+```
+The brightcove player will be appended as a child to this element.
+
 ```js
+var domElement = document.getElementById('player'); // or use jQuery etc. to get the element
+
 var player = bright(domElement, options);
 
 player.load(videoId);
