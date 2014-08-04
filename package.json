@@ -11,10 +11,10 @@
     "test": "tests"
   },
   "scripts": {
-    "start": "webpack src/bright.js dist/bright.js --watch --output-library bright --output-library-target umd --progress --colors",
+    "start": "webpack src/bright.js dist/bright.js --watch --output-library Bright --output-library-target umd --progress --colors",
     "build": "npm run build-dev; npm run build-min",
-    "build-dev": "webpack src/bright.js dist/bright.js --output-library bright --output-library-target umd --progress --colors",
-    "build-min": "webpack src/bright.js dist/bright.min.js --optimize-minimize --output-library bright --output-library-target umd --progress --colors",
+    "build-dev": "webpack src/bright.js dist/bright.js --output-library Bright --output-library-target umd --progress --colors",
+    "build-min": "webpack src/bright.js dist/bright.min.js --optimize-minimize --output-library Bright --output-library-target umd --progress --colors",
     "test": "open 'http://localhost:8000/tests' && python -m SimpleHTTPServer"
   },
   "author": "edenspiekermann",
@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "component-emitter": "^1.1.2",
-    "lodash-node": "^2.4.1"
+    "lodash-node": "^2.4.1",
+    "maxhoffmann-emitter": "git://github.com/maxhoffmann/emitter"
   }
 }

@@ -5,6 +5,12 @@
   <title>bright tests</title>
   <meta name="description" content="testrunner for bright">
   <meta name="author" content="Edenspiekermann">
+  <style>
+  	#player {
+  		width: 400px;
+  		height: 200px;
+  	}
+  </style>
 </head>
 <body>
   <div id="player"></div>
@@ -14,6 +20,7 @@
   <script src="//admin.brightcove.com/js/BrightcoveExperiences.js"></script>
   <script src="../dist/bright.js"></script>
   <script>
+
   var testData = {
     brightcoveVideoId: 1926945850001,
     brightcovePlayerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
@@ -25,7 +32,14 @@
   var pauseButtonElement = document.getElementById('pause');
 
   var options = { playerKey: testData.brightcovePlayerKey };
-  var player = bright(playerElement, options);
+  var player = Bright(playerElement, options);
+  player.on('init', function(player) {
+  	player.load(testData.brightcoveVideoId);
+  });
+  player.on('load', function(player) {
+	player.play();
+  });
+  player.init();
 
   loadButtonElement.onclick = function() {
     player.load(testData.brightcoveVideoId);
@@ -38,7 +52,7 @@
   };
 
   player.on('init', log('init'));
-  player.on('loadstart', log('loadstart'));
+  player.on('load', log('load'));
   player.on('play', log('play'));
   player.on('pause', log('pause'));
   player.on('ended', log('ended'));
