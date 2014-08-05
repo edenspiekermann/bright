@@ -73,16 +73,22 @@ function Bright(element, options) {
 
 	function load(videoId) {
 		if (!videoId) throw new Error('missing video id');
-		player.cueVideoByID(videoId);
+
+		var brightcoveMethod = 'cueVideoByID';
+		if (typeof videoId === 'string') {
+				brightcoveMethod = 'cueVideoByReferenceID';
+		}
+
+		player[brightcoveMethod](videoId);
 	}
 
 	function play(videoId) {
-		var method = 'play';
-		if (videoId) {
-			method = 'loadVideoByID';
-		}
+		var brightcoveMethod = 'play';
+		if (typeof videoId === 'number') brightcoveMethod = 'loadVideoByID';
+		if (typeof videoId === 'string') brightcoveMethod = 'loadVideoByReferenceID';
+
 		setTimeout(function() {
-			player[method](videoId);
+			player[brightcoveMethod](videoId);
 		});
 	}
 
