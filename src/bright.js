@@ -1,8 +1,12 @@
 var assign = require('lodash-node/modern/objects/assign');
 var Emitter = require('maxhoffmann-emitter');
-require('./object-freeze-sham');
+
+var createObjectTag = require('./helpers/createObjectTag');
+require('./helpers/object-freeze-sham');
 
 var uniqueId = 0;
+var readyHandlers = {};
+var loadHandlers = {};
 var defaults = {
 	isVid: true,
 	isUI: true,
@@ -94,27 +98,11 @@ function Bright(element, options) {
 	return bright;
 }
 
-function createObjectTag(options) {
-  var object = document.createElement('object');
-  for (var param in options) object.appendChild(createParam(param, options[param]));
-  return object;
-}
-
-function createParam(name, value) {
-  var param = document.createElement('param');
-  param.name = name;
-  param.value = value;
-  return param;
-}
-
 if (typeof window.__brightcoveTemplateHandlers !== 'undefined') {
 	var message = 'global variable __brightcoveTemplateHandlers is already defined. ';
 		 message += 'Did you load "bright" more than once?';
 	throw new Error(message);
 }
-
-var readyHandlers = {};
-var loadHandlers = {};
 
 window.__brightcoveTemplateHandlers = {
 	ready: function(event) {
