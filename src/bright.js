@@ -19,7 +19,7 @@ function Bright(element, options) {
 
 	options = assign({}, defaults, options);
 
-  var player;
+  var player, loadedVideoId;
 	var playerId = 'bright'+(uniqueId++);
 	loadHandlers[playerId] = loadHandler;
 	readyHandlers[playerId] = readyHandler;
@@ -33,7 +33,8 @@ function Bright(element, options) {
 		once: emitter.once,
 		off: emitter.off
 	});
-	return bright;
+
+	bright.on('init', loadLastVideo);
 
 	function init() {
 		var object = createObjectTag(options);
@@ -43,12 +44,15 @@ function Bright(element, options) {
 		window.brightcove.createExperience(object, element, true);
 	}
 
+	function loadLastVideo() {
+		if (player && loadedVideoId) bright.load(loadedVideoId);
+	}
+
 	function loadHandler() {
 	  var brightcoveAPI = window.brightcove.api;
 	  var experience = brightcoveAPI.getExperience(playerId);
 
 	  player = experience.getModule(brightcoveAPI.modules.APIModules.VIDEO_PLAYER);
-	  emitter.trigger('init', bright);
 	}
 
 	function readyHandler() {
@@ -57,6 +61,7 @@ function Bright(element, options) {
 	  player.addEventListener(brightcoveEvent.PLAY, emitter.trigger.bind(null, 'play', bright));
 	  player.addEventListener(brightcoveEvent.STOP, emitter.trigger.bind(null, 'pause', bright));
 	  player.addEventListener(brightcoveEvent.COMPLETE, emitter.trigger.bind(null, 'ended', bright));
+	  emitter.trigger('init', bright);
 	}
 
 	function load(videoId) {
@@ -68,6 +73,7 @@ function Bright(element, options) {
 		}
 
 		player[brightcoveMethod](videoId);
+		loadedVideoId = videoId;
 	}
 
 	function play(videoId) {
@@ -77,12 +83,15 @@ function Bright(element, options) {
 
 		setTimeout(function() {
 			player[brightcoveMethod](videoId);
+			loadedVideoId = videoId;
 		});
 	}
 
 	function pause() {
 		player.pause();
 	}
+
+	return bright;
 }
 
 function createObjectTag(options) {
