@@ -183,10 +183,10 @@ test('display: none', function() {
   });
 
   player.once('load', function(player) {
-  	wrapper.style.cssText = "display:none";
+  	wrapper.style.display = 'none';
 
   	setTimeout(function() {
-  	  wrapper.style.cssText = "";
+  	  wrapper.style.display = '';
 
   	  player.reinit();
 
@@ -217,10 +217,10 @@ test('visibility: hidden', function() {
   player.load(testData.brightcoveVideoId);
 
   setTimeout(function() {
-    wrapper.style.cssText = "visibility:hidden";
+    wrapper.style.visibility = 'hidden';
 
     setTimeout(function() {
-      wrapper.style.cssText = "";
+      wrapper.style.visibility = '';
 
       player.init();
 
