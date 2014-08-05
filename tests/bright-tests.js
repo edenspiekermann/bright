@@ -12,7 +12,7 @@ function log(event) {
 
 module('API');
 
-test('Initialization', function() {
+test('init', function() {
 	expect(2);
 	stop(2);
 
@@ -39,7 +39,7 @@ test('Initialization', function() {
 	player2.init();
 });
 
-test('Player', function() {
+test('methods', function() {
 	expect(11);
 	stop(6);
 
@@ -127,7 +127,7 @@ test('Player', function() {
 	player2.on('ended', log('ended'));
 });
 
-test('Player', function() {
+test('play', function() {
 	expect(1);
 	stop();
 
@@ -147,9 +147,7 @@ test('Player', function() {
 	});
 });
 
-module('Error Handling');
-
-test('Wrong Usage', function() {
+test('load', function() {
 	expect(1);
 	stop();
 
@@ -169,70 +167,70 @@ test('Wrong Usage', function() {
 	player.init();
 });
 
-// test('display: none', function() {
-//   expect(1);
-//   stop();
+test('display-none', function() {
+  expect(1);
+  stop();
 
-//   var element = document.getElementById('player1');
-//   var wrapper = document.getElementById('qunit-fixture');
+  var element = document.getElementById('player1');
+  var wrapper = document.getElementById('qunit-fixture');
 
-//   var player = Bright(element, {
-//     playerKey: testData.brightcovePlayerKey
-//   });
+  var player = Bright(element, {
+    playerKey: testData.brightcovePlayerKey
+  });
 
-//   player.once('init', function(player) {
-//      player.load(testData.brightcoveVideoId);
-//   });
+  player.once('init', function(player) {
+     player.load(testData.brightcoveVideoId);
+  });
 
-//   player.once('load', function(player) {
-//   	wrapper.style.cssText = "display:none";
+  player.once('load', function(player) {
+  	wrapper.style.cssText = "display:none";
 
-//   	setTimeout(function() {
-//   	  wrapper.style.cssText = "";
+  	setTimeout(function() {
+  	  wrapper.style.cssText = "";
 
-//   	  player.reinit();
+  	  player.reinit();
 
-//   	  player.once('load', function() {
-//   	    ok(true, 'player can be reinitialized after it was hidden via CSS');
-//   	    start();
-//   	  });
-//   	});
-//   });
+  	  player.once('load', function() {
+  	    ok(true, 'player can be reinitialized after it was hidden via CSS');
+  	    start();
+  	  });
+  	});
+  });
 
-//   player.init();
+  player.init();
 
-//   player.on('init', log('init'));
-//   player.on('load', log('load'));
-// });
+  player.on('init', log('init'));
+  player.on('load', log('load'));
+});
 
-// test('visibility: hidden', function() {
-//   expect(1);
-//   stop();
+test('visibility: hidden', function() {
+  expect(1);
+  stop();
 
-//   var element = document.getElementById('player1');
-//   var wrapper = document.getElementById('qunit-fixture');
+  var element = document.getElementById('player1');
+  var wrapper = document.getElementById('qunit-fixture');
 
-//   var player = Bright(element, {
-//     playerKey: testData.brightcovePlayerKey
-//   });
+  var player = Bright(element, {
+    playerKey: testData.brightcovePlayerKey
+  });
 
-//   player.load(testData.brightcoveVideoId);
+  player.load(testData.brightcoveVideoId);
 
-//   setTimeout(function() {
-//     wrapper.style.cssText = "visibility:hidden";
+  setTimeout(function() {
+    wrapper.style.cssText = "visibility:hidden";
 
-//     setTimeout(function() {
-//       wrapper.style.cssText = "";
+    setTimeout(function() {
+      wrapper.style.cssText = "";
 
-//       player.init();
+      player.init();
 
-//       player.once('load', function() {
-//         ok(true, 'player can be reinitialized after it was hidden via CSS');
-//         start();
-//       });
-//     }, 2000);
-//   }, 2000);
+      player.once('load', function() {
+        ok(true, 'player can be reinitialized after it was hidden via CSS');
+        start();
+      });
+    }, 2000);
+  }, 2000);
 
-//   player.on('init', log('init'));
-//   player.on('load', log('load'));
-// });
+  player.on('init', log('init'));
+  player.on('load', log('load'));
+});
