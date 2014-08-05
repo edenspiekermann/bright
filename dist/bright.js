@@ -54,43 +54,36 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var assign = __webpack_require__(2);
-	var Emitter = __webpack_require__(1);
+	__webpack_require__(1);
+
+	var Emitter = __webpack_require__(3);
+	var assign = __webpack_require__(4);
+
+	var createObjectTag = __webpack_require__(2);
 
 	var uniqueId = 0;
 	var readyHandlers = {};
 	var loadHandlers = {};
-
-	if (typeof window.bright !== 'undefined') throw new Error('bright is already defined');
-	window.__brightHandlers = {
-		ready: function(event) {
-			readyHandlers[event.target.experience.id]();
-		},
-		load: function(id) {
-			loadHandlers[id]();
-		}
+	var defaults = {
+		isVid: true,
+		isUI: true,
+		includeAPI: true,
+		wmode: 'transparent',
+		bgcolor: '#ffffff',
+		templateLoadHandler: '__brightcoveTemplateHandlers.load',
+		templateReadyHandler: '__brightcoveTemplateHandlers.ready'
 	};
 
 	function Bright(element, options) {
 
-		var defaults = {
-			isVid: true,
-			isUI: true,
-			includeAPI: true,
-			wmode: 'transparent',
-			bgcolor: '#ffffff',
-			templateLoadHandler: '__brightHandlers.load',
-			templateReadyHandler: '__brightHandlers.ready'
-		};
+		var emitter = Emitter();
+
 		options = assign({}, defaults, options);
 
-	  var emitter = Emitter();
-
-		var id = 'bright'+(++uniqueId);
-		loadHandlers[id] = loadHandler;
-		readyHandlers[id] = readyHandler;
-
-	  var player;
+	  var player, loadedVideoId;
+		var playerId = 'bright'+(uniqueId++);
+		loadHandlers[playerId] = loadHandler;
+		readyHandlers[playerId] = readyHandler;
 
 		var bright = Object.freeze({
 			init: init,
@@ -101,50 +94,111 @@ return /******/ (function(modules) { // webpackBootstrap
 			once: emitter.once,
 			off: emitter.off
 		});
-		return bright;
+
+		bright.on('init', loadLastVideo);
 
 		function init() {
 			var object = createObjectTag(options);
-			object.id = id;
+			object.id = playerId;
 			element.innerHTML = '';
 
 			window.brightcove.createExperience(object, element, true);
 		}
 
+		function loadLastVideo() {
+			if (player && loadedVideoId) bright.load(loadedVideoId);
+		}
+
 		function loadHandler() {
 		  var brightcoveAPI = window.brightcove.api;
-		  var experience = brightcoveAPI.getExperience(id);
+		  var experience = brightcoveAPI.getExperience(playerId);
+
 		  player = experience.getModule(brightcoveAPI.modules.APIModules.VIDEO_PLAYER);
-		  emitter.trigger('init', bright);
 		}
 
 		function readyHandler() {
 			var brightcoveEvent = window.brightcove.api.events.MediaEvent;
-		  player.addEventListener(brightcoveEvent.CHANGE, emitter.trigger.bind(null, 'load', bright));
-		  player.addEventListener(brightcoveEvent.PLAY, emitter.trigger.bind(null, 'play', bright));
-		  player.addEventListener(brightcoveEvent.STOP, emitter.trigger.bind(null, 'pause', bright));
-		  player.addEventListener(brightcoveEvent.COMPLETE, emitter.trigger.bind(null, 'ended', bright));
+		  player.addEventListener(brightcoveEvent.CHANGE, trigger('load', bright));
+		  player.addEventListener(brightcoveEvent.PLAY, trigger('play', bright));
+		  player.addEventListener(brightcoveEvent.STOP, trigger('pause', bright));
+		  player.addEventListener(brightcoveEvent.COMPLETE, trigger('ended', bright));
+		  emitter.trigger('init', bright);
+		}
+
+		function trigger() {
+			var args = arguments;
+			return function() {
+		  	emitter.trigger.apply(null, args);
+			};
 		}
 
 		function load(videoId) {
 			if (!videoId) throw new Error('missing video id');
-			player.cueVideoByID(videoId);
+
+			var brightcoveMethod = 'cueVideoByID';
+			if (typeof videoId === 'string') {
+					brightcoveMethod = 'cueVideoByReferenceID';
+			}
+
+			player[brightcoveMethod](videoId);
+			loadedVideoId = videoId;
 		}
 
 		function play(videoId) {
-			var method = 'play';
-			if (videoId) {
-				method = 'loadVideoByID';
-			}
+			var brightcoveMethod = 'play';
+			if (typeof videoId === 'number') brightcoveMethod = 'loadVideoByID';
+			if (typeof videoId === 'string') brightcoveMethod = 'loadVideoByReferenceID';
+
 			setTimeout(function() {
-				player[method](videoId);
+				player[brightcoveMethod](videoId);
+				loadedVideoId = videoId;
 			});
 		}
 
 		function pause() {
 			player.pause();
 		}
+
+		return bright;
 	}
+
+	if (typeof window.__brightcoveTemplateHandlers !== 'undefined') {
+		var message = 'global variable __brightcoveTemplateHandlers is already defined. ';
+			 message += 'Did you load "bright" more than once?';
+		throw new Error(message);
+	}
+
+	window.__brightcoveTemplateHandlers = {
+		ready: function(event) {
+			var playerId = event.target.experience.id;
+			readyHandlers[playerId]();
+		},
+		load: function(playerId) {
+			loadHandlers[playerId]();
+		}
+	};
+
+	module.exports = Bright;
+
+
+/***/ },
+/* 1 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// This prevents throwing an error if code with Object.freeze is executed in Browsers
+	// that don’t support it.
+	// Note that this code returns the object without freezing it.
+
+	if (!Object.freeze) {
+	  Object.prototype.freeze = function(object) {
+	    return object;
+	  };
+	}
+
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
 
 	function createObjectTag(options) {
 	  var object = document.createElement('object');
@@ -159,11 +213,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return param;
 	}
 
-	module.exports = Bright;
+	module.exports = createObjectTag;
 
 
 /***/ },
-/* 1 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	function Emitter() {
@@ -236,7 +290,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 2 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -247,9 +301,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var baseCreateCallback = __webpack_require__(4),
-	    keys = __webpack_require__(3),
-	    objectTypes = __webpack_require__(5);
+	var baseCreateCallback = __webpack_require__(6),
+	    keys = __webpack_require__(5),
+	    objectTypes = __webpack_require__(7);
 
 	/**
 	 * Assigns own enumerable properties of source object(s) to the destination
@@ -312,7 +366,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 3 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -323,9 +377,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var isNative = __webpack_require__(6),
-	    isObject = __webpack_require__(7),
-	    shimKeys = __webpack_require__(8);
+	var isNative = __webpack_require__(8),
+	    isObject = __webpack_require__(9),
+	    shimKeys = __webpack_require__(10);
 
 	/* Native method shortcuts for methods with the same name as other `lodash` methods */
 	var nativeKeys = isNative(nativeKeys = Object.keys) && nativeKeys;
@@ -354,7 +408,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 4 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -365,10 +419,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var bind = __webpack_require__(11),
-	    identity = __webpack_require__(12),
-	    setBindData = __webpack_require__(9),
-	    support = __webpack_require__(10);
+	var bind = __webpack_require__(13),
+	    identity = __webpack_require__(14),
+	    setBindData = __webpack_require__(11),
+	    support = __webpack_require__(12);
 
 	/** Used to detected named functions */
 	var reFuncName = /^\s*function[ \n\r\t]+\w/;
@@ -440,7 +494,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 5 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -466,7 +520,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 6 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -506,7 +560,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 7 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -517,7 +571,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var objectTypes = __webpack_require__(5);
+	var objectTypes = __webpack_require__(7);
 
 	/**
 	 * Checks if `value` is the language type of Object.
@@ -551,7 +605,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 8 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -562,7 +616,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var objectTypes = __webpack_require__(5);
+	var objectTypes = __webpack_require__(7);
 
 	/** Used for native method references */
 	var objectProto = Object.prototype;
@@ -595,7 +649,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 9 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -606,8 +660,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var isNative = __webpack_require__(6),
-	    noop = __webpack_require__(13);
+	var isNative = __webpack_require__(8),
+	    noop = __webpack_require__(15);
 
 	/** Used as the property descriptor for `__bindData__` */
 	var descriptor = {
@@ -644,7 +698,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 10 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -655,7 +709,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var isNative = __webpack_require__(6);
+	var isNative = __webpack_require__(8);
 
 	/** Used to detect functions containing a `this` reference */
 	var reThis = /\bthis\b/;
@@ -691,7 +745,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 11 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -702,8 +756,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var createWrapper = __webpack_require__(14),
-	    slice = __webpack_require__(15);
+	var createWrapper = __webpack_require__(16),
+	    slice = __webpack_require__(17);
 
 	/**
 	 * Creates a function that, when called, invokes `func` with the `this`
@@ -737,7 +791,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 12 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -771,7 +825,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 13 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -803,7 +857,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 14 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -814,10 +868,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var baseBind = __webpack_require__(16),
-	    baseCreateWrapper = __webpack_require__(17),
-	    isFunction = __webpack_require__(18),
-	    slice = __webpack_require__(15);
+	var baseBind = __webpack_require__(18),
+	    baseCreateWrapper = __webpack_require__(19),
+	    isFunction = __webpack_require__(20),
+	    slice = __webpack_require__(17);
 
 	/**
 	 * Used for `Array` method references.
@@ -915,7 +969,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 15 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -959,7 +1013,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 16 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -970,10 +1024,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var baseCreate = __webpack_require__(19),
-	    isObject = __webpack_require__(7),
-	    setBindData = __webpack_require__(9),
-	    slice = __webpack_require__(15);
+	var baseCreate = __webpack_require__(21),
+	    isObject = __webpack_require__(9),
+	    setBindData = __webpack_require__(11),
+	    slice = __webpack_require__(17);
 
 	/**
 	 * Used for `Array` method references.
@@ -1027,7 +1081,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 17 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -1038,10 +1092,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var baseCreate = __webpack_require__(19),
-	    isObject = __webpack_require__(7),
-	    setBindData = __webpack_require__(9),
-	    slice = __webpack_require__(15);
+	var baseCreate = __webpack_require__(21),
+	    isObject = __webpack_require__(9),
+	    setBindData = __webpack_require__(11),
+	    slice = __webpack_require__(17);
 
 	/**
 	 * Used for `Array` method references.
@@ -1111,7 +1165,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 18 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -1144,7 +1198,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 19 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -1155,9 +1209,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <http://lodash.com/license>
 	 */
-	var isNative = __webpack_require__(6),
-	    isObject = __webpack_require__(7),
-	    noop = __webpack_require__(13);
+	var isNative = __webpack_require__(8),
+	    isObject = __webpack_require__(9),
+	    noop = __webpack_require__(15);
 
 	/* Native method shortcuts for methods with the same name as other `lodash` methods */
 	var nativeCreate = isNative(nativeCreate = Object.create) && nativeCreate;
