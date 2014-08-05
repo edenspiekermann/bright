@@ -1,5 +1,6 @@
 var assign = require('lodash-node/modern/objects/assign');
 var Emitter = require('maxhoffmann-emitter');
+require('./object-freeze-sham');
 
 var uniqueId = 0;
 var readyHandlers = {};
