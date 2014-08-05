@@ -2,39 +2,26 @@ var assign = require('lodash-node/modern/objects/assign');
 var Emitter = require('maxhoffmann-emitter');
 require('./object-freeze-sham');
 
-var uniqueId = 0;
-var readyHandlers = {};
-var loadHandlers = {};
-
-if (typeof window.bright !== 'undefined') throw new Error('bright is already defined');
-window.__brightHandlers = {
-	ready: function(event) {
-		readyHandlers[event.target.experience.id]();
-	},
-	load: function(id) {
-		loadHandlers[id]();
-	}
+var uniquePlayerId = 0;
+var defaults = {
+	isVid: true,
+	isUI: true,
+	includeAPI: true,
+	wmode: 'transparent',
+	bgcolor: '#ffffff',
+	templateLoadHandler: '__brightHandlers.load',
+	templateReadyHandler: '__brightHandlers.ready'
 };
 
 function Bright(element, options) {
 
-	var defaults = {
-		isVid: true,
-		isUI: true,
-		includeAPI: true,
-		wmode: 'transparent',
-		bgcolor: '#ffffff',
-		templateLoadHandler: '__brightHandlers.load',
-		templateReadyHandler: '__brightHandlers.ready'
-	};
+	var emitter = Emitter();
+
 	options = assign({}, defaults, options);
 
-  var emitter = Emitter();
-
-	var id = 'bright'+(++uniqueId);
+	var id = 'bright'+(uniquePlayerId++);
 	loadHandlers[id] = loadHandler;
 	readyHandlers[id] = readyHandler;
-
   var player;
 
 	var bright = Object.freeze({
@@ -109,5 +96,21 @@ function createParam(name, value) {
   param.value = value;
   return param;
 }
+
+if (typeof window.__brightHandlers !== 'undefined') {
+	throw new Error('global variable __brightHandlers is already defined');
+}
+
+var readyHandlers = {};
+var loadHandlers = {};
+
+window.__brightHandlers = {
+	ready: function(event) {
+		readyHandlers[event.target.experience.id]();
+	},
+	load: function(id) {
+		loadHandlers[id]();
+	}
+};
 
 module.exports = Bright;
