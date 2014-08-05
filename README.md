@@ -1,6 +1,6 @@
 # bright
 
-This abstraction wraps the [brightcove smart player api](http://docs.brightcove.com/en/video-cloud/smart-player-api/references/) with an easy to use interface. bright’s API follows the naming conventions of the official HTML5 Media and Media Events API. An example of the full standard can be found at http://www.w3.org/2010/05/video/mediaevents.html.
+This facade wraps the [brightcove smart player api](http://docs.brightcove.com/en/video-cloud/smart-player-api/references/) with an easy to use interface.
 
 
 ## Installation

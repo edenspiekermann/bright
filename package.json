@@ -1,7 +1,7 @@
 {
   "name": "bright",
   "version": "0.0.1",
-  "description": "easy brightcove abstraction",
+  "description": "easy to use brightcove facade",
   "main": "dist/bright.js",
   "repository": {
     "type": "git",
