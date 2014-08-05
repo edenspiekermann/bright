@@ -167,7 +167,7 @@ test('load', function() {
 	player.init();
 });
 
-test('display-none', function() {
+test('display: none', function() {
   expect(1);
   stop();
 
