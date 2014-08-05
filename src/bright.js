@@ -2,15 +2,15 @@ var assign = require('lodash-node/modern/objects/assign');
 var Emitter = require('maxhoffmann-emitter');
 require('./object-freeze-sham');
 
-var uniquePlayerId = 0;
+var uniqueId = 0;
 var defaults = {
 	isVid: true,
 	isUI: true,
 	includeAPI: true,
 	wmode: 'transparent',
 	bgcolor: '#ffffff',
-	templateLoadHandler: '__brightHandlers.load',
-	templateReadyHandler: '__brightHandlers.ready'
+	templateLoadHandler: '__brightcoveTemplateHandlers.load',
+	templateReadyHandler: '__brightcoveTemplateHandlers.ready'
 };
 
 function Bright(element, options) {
@@ -19,10 +19,10 @@ function Bright(element, options) {
 
 	options = assign({}, defaults, options);
 
-	var id = 'bright'+(uniquePlayerId++);
-	loadHandlers[id] = loadHandler;
-	readyHandlers[id] = readyHandler;
   var player;
+	var playerId = 'bright'+(uniqueId++);
+	loadHandlers[playerId] = loadHandler;
+	readyHandlers[playerId] = readyHandler;
 
 	var bright = Object.freeze({
 		init: init,
@@ -37,7 +37,7 @@ function Bright(element, options) {
 
 	function init() {
 		var object = createObjectTag(options);
-		object.id = id;
+		object.id = playerId;
 		element.innerHTML = '';
 
 		window.brightcove.createExperience(object, element, true);
@@ -45,7 +45,8 @@ function Bright(element, options) {
 
 	function loadHandler() {
 	  var brightcoveAPI = window.brightcove.api;
-	  var experience = brightcoveAPI.getExperience(id);
+	  var experience = brightcoveAPI.getExperience(playerId);
+
 	  player = experience.getModule(brightcoveAPI.modules.APIModules.VIDEO_PLAYER);
 	  emitter.trigger('init', bright);
 	}
@@ -97,19 +98,22 @@ function createParam(name, value) {
   return param;
 }
 
-if (typeof window.__brightHandlers !== 'undefined') {
-	throw new Error('global variable __brightHandlers is already defined');
+if (typeof window.__brightcoveTemplateHandlers !== 'undefined') {
+	var message = 'global variable __brightcoveTemplateHandlers is already defined. ';
+		 message += 'Did you load "bright" more than once?';
+	throw new Error(message);
 }
 
 var readyHandlers = {};
 var loadHandlers = {};
 
-window.__brightHandlers = {
+window.__brightcoveTemplateHandlers = {
 	ready: function(event) {
-		readyHandlers[event.target.experience.id]();
+		var playerId = event.target.experience.id;
+		readyHandlers[playerId]();
 	},
-	load: function(id) {
-		loadHandlers[id]();
+	load: function(playerId) {
+		loadHandlers[playerId]();
 	}
 };
 
