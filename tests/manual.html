@@ -33,12 +33,6 @@
 
   var options = { playerKey: testData.brightcovePlayerKey };
   var player = Bright(playerElement, options);
-  player.on('init', function(player) {
-  	player.load(testData.brightcoveVideoId);
-  });
-  player.on('load', function(player) {
-	player.play();
-  });
   player.init();
 
   loadButtonElement.onclick = function() {
