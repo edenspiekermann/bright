@@ -14,20 +14,20 @@ npm install edenspiekermann/brightcove-wrapper --save
 
 ## Usage
 
-The source files are built by webpack to the UMD format. This means you can require `dist/bright.js` via webpack, browserify or require.js. Although it’s not recommended you can also include `dist/bright.min.js` in your html. This creates a global variable called `bright`.
+The source files are built by webpack to the UMD format. This means you can require `dist/bright.js` via webpack, browserify or require.js. Although it’s not recommended you can also include `dist/bright.min.js` in your html. This creates a global variable called `Bright`.
 
 _Common.js (webpack, browserify…)_
 ```js
-var bright = require('bright'); // installed via npm
-var bright = require('./path_to/bright.js'); // use the one in the dist folder
+var Bright = require('bright'); // installed via npm
+var Bright = require('./path_to/bright.js'); // use the one in the dist folder
 
-var player = bright(domElement, options);
+var player = Bright(domElement, options);
 ```
 
 _Require.js_
 ```js
-require(['bright'], function(bright) {
-  var player = bright(domElement, options);
+require(['Bright'], function(Bright) {
+  var player = Bright(domElement, options);
 });
 ```
 
@@ -39,7 +39,7 @@ _Global Variable_
 ```
 ```js
 // main.js
-var player = bright(domElement, options);
+var player = Bright(domElement, options);
 ```
 
 ___Note:___ `//admin.brightcove.com/js/BrightcoveExperiences.js` has to be loaded __before__ `bright.js`. Use your favorite script loader or simply add a `script` tag before your main js file.
@@ -56,41 +56,33 @@ The brightcove player will be appended as a child to this element.
 ```js
 var domElement = document.getElementById('player'); // or use jQuery etc. to get the element
 
-var player = bright(domElement, options);
+var player = Bright(domElement, options);
 
-player.load(videoId);
-player.play();
-player.play(videoId); // loads and plays video
-player.pause();
+player.on('init', function(player) { // wait for init of player
+  
+  player.load(videoId);
+  player.play();
+  player.play(videoId); // loads and plays video
+  player.pause();
 
-// chaining
-player.load(videoId).play();
-
-// reinitialize player after it was hidden via CSS
-player.init();
-
-// events
-player.on('ended', function(player) {
-  player.load(nextVideoID);
 });
+
+player.init(); // init player (also call this method if the player was hidden by CSS)
 ```
 
 Possible __options__ for brightcove can be found at [this page](http://support.brightcove.com/de/video-cloud/dokumente/player-konfigurationsparameter#supported) from the official documentation.
 
 Currently supported __events__:
 - init
-- loadstart
+- load
 - play
 - pause
 - ended
 
-__event methods__ are copied from [component/emitter](https://github.com/component/emitter):
+These __event methods__ are copied from [maxhoffmann/emitter](https://github.com/maxhoffmann/emitter):
 - on(event, fn)
 - once(event, fn)
 - off(event, fn)
-- emit(event, …)
-- listeners(event)
-- hasListeners(event)
 
 
 ## Testing
