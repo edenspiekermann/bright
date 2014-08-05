@@ -1,8 +1,9 @@
-var assign = require('lodash-node/modern/objects/assign');
+require('./helpers/object-freeze-sham');
+
 var Emitter = require('maxhoffmann-emitter');
+var assign = require('lodash-node/modern/objects/assign');
 
 var createObjectTag = require('./helpers/createObjectTag');
-require('./helpers/object-freeze-sham');
 
 var uniqueId = 0;
 var readyHandlers = {};
@@ -61,11 +62,18 @@ function Bright(element, options) {
 
 	function readyHandler() {
 		var brightcoveEvent = window.brightcove.api.events.MediaEvent;
-	  player.addEventListener(brightcoveEvent.CHANGE, emitter.trigger.bind(null, 'load', bright));
-	  player.addEventListener(brightcoveEvent.PLAY, emitter.trigger.bind(null, 'play', bright));
-	  player.addEventListener(brightcoveEvent.STOP, emitter.trigger.bind(null, 'pause', bright));
-	  player.addEventListener(brightcoveEvent.COMPLETE, emitter.trigger.bind(null, 'ended', bright));
+	  player.addEventListener(brightcoveEvent.CHANGE, trigger('load', bright));
+	  player.addEventListener(brightcoveEvent.PLAY, trigger('play', bright));
+	  player.addEventListener(brightcoveEvent.STOP, trigger('pause', bright));
+	  player.addEventListener(brightcoveEvent.COMPLETE, trigger('ended', bright));
 	  emitter.trigger('init', bright);
+	}
+
+	function trigger() {
+		var args = arguments;
+		return function() {
+	  	emitter.trigger.apply(null, args);
+		};
 	}
 
 	function load(videoId) {
