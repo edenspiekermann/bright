@@ -6,7 +6,7 @@ var testData = {
 };
 function log(event) {
 	return function() {
-		if (typeof console !== "undefined") console.log(event);
+		if (typeof console !== 'undefined') console.log(event);
 	};
 }
 
