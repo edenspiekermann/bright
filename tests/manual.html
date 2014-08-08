@@ -22,8 +22,8 @@
   <script>
 
   var testData = {
-    brightcoveVideoId: 1926945850001,
-    brightcovePlayerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
+    brightcoveVideoId: 2470339735001,
+    brightcovePlayerKey: 'AQ~~,AAAB051hMkE~,GF6aXC8LXBNMR9-3c7Rsg36sl9a6CIqi'
   };
 
   var playerElement = document.getElementById('player');
@@ -33,6 +33,7 @@
 
   var options = { playerKey: testData.brightcovePlayerKey };
   var player = Bright(playerElement, options);
+  player.on('ended', window.alert.bind(window));
   player.init();
 
   loadButtonElement.onclick = function() {

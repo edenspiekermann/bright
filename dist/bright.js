@@ -64,14 +64,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	var uniqueId = 0;
 	var readyHandlers = {};
 	var loadHandlers = {};
+	var isPlayerReady = {};
 	var defaults = {
-		isVid: true,
+		isVid: true, // required for all video players (totally nonsense by brightcove)
 		isUI: true,
-		includeAPI: true,
-		wmode: 'transparent',
-		bgcolor: '#ffffff',
+		includeAPI: true, // enable HTML5 "smart" player
+		wmode: 'transparent', // transparent backbround color for flash player
+		bgcolor: '#FFFFFF', // the players background color
+		showNoContentMessage: false, // hide error message if no video is loaded
 		templateLoadHandler: '__brightcoveTemplateHandlers.load',
-		templateReadyHandler: '__brightcoveTemplateHandlers.ready'
+		templateReadyHandler: '__brightcoveTemplateHandlers.ready',
+		templateErrorHandler: '__brightcoveTemplateHandlers.error'
 	};
 
 	function Bright(element, options) {
@@ -80,13 +83,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		options = assign({}, defaults, options);
 
-	  var player, loadedVideoId;
+	  var player;
 		var playerId = 'bright'+(uniqueId++);
 		loadHandlers[playerId] = loadHandler;
 		readyHandlers[playerId] = readyHandler;
 
 		var bright = Object.freeze({
-			init: init,
 			load: load,
 			play: play,
 			pause: pause,
@@ -95,9 +97,11 @@ return /******/ (function(modules) { // webpackBootstrap
 			off: emitter.off
 		});
 
-		bright.on('init', loadLastVideo);
+		function load(videoId) {
+			if (!videoId) throw new Error('missing video id');
 
-		function init() {
+			options["@videoPlayer"] = videoId;
+
 			var object = createObjectTag(options);
 			object.id = playerId;
 			element.innerHTML = '';
@@ -105,23 +109,20 @@ return /******/ (function(modules) { // webpackBootstrap
 			window.brightcove.createExperience(object, element, true);
 		}
 
-		function loadLastVideo() {
-			if (player && loadedVideoId) bright.load(loadedVideoId);
-		}
-
 		function loadHandler() {
 		  var brightcoveAPI = window.brightcove.api;
+		  var brightcoveEvent = brightcoveAPI.events.MediaEvent;
 		  var experience = brightcoveAPI.getExperience(playerId);
 
 		  player = experience.getModule(brightcoveAPI.modules.APIModules.VIDEO_PLAYER);
-		}
 
-		function readyHandler() {
-			var brightcoveEvent = window.brightcove.api.events.MediaEvent;
 		  player.addEventListener(brightcoveEvent.CHANGE, trigger('load', bright));
 		  player.addEventListener(brightcoveEvent.PLAY, trigger('play', bright));
 		  player.addEventListener(brightcoveEvent.STOP, trigger('pause', bright));
 		  player.addEventListener(brightcoveEvent.COMPLETE, trigger('ended', bright));
+		}
+
+		function readyHandler() {
 		  emitter.trigger('init', bright);
 		}
 
@@ -132,27 +133,8 @@ return /******/ (function(modules) { // webpackBootstrap
 			};
 		}
 
-		function load(videoId) {
-			if (!videoId) throw new Error('missing video id');
-
-			var brightcoveMethod = 'cueVideoByID';
-			if (typeof videoId === 'string') {
-					brightcoveMethod = 'cueVideoByReferenceID';
-			}
-
-			player[brightcoveMethod](videoId);
-			loadedVideoId = videoId;
-		}
-
-		function play(videoId) {
-			var brightcoveMethod = 'play';
-			if (typeof videoId === 'number') brightcoveMethod = 'loadVideoByID';
-			if (typeof videoId === 'string') brightcoveMethod = 'loadVideoByReferenceID';
-
-			setTimeout(function() {
-				player[brightcoveMethod](videoId);
-				loadedVideoId = videoId;
-			});
+		function play() {
+			player.play();
 		}
 
 		function pause() {
@@ -169,12 +151,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	window.__brightcoveTemplateHandlers = {
+		load: function(playerId) {
+			isPlayerReady[playerId] = false;
+			loadHandlers[playerId]();
+		},
 		ready: function(event) {
 			var playerId = event.target.experience.id;
+			if (isPlayerReady[playerId]) return;
+			isPlayerReady[playerId] = true;
 			readyHandlers[playerId]();
 		},
-		load: function(playerId) {
-			loadHandlers[playerId]();
+		error: function(event) {
+			var playerId = event.id;
+			if (isPlayerReady[playerId]) return;
+			if(playerId && event.code === 4) {
+				isPlayerReady[playerId] = true;
+				readyHandlers[playerId]();
+			}
 		}
 	};
 
