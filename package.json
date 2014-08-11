@@ -1,6 +1,6 @@
 {
   "name": "bright",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "easy to use brightcove facade",
   "main": "dist/bright.js",
   "repository": {
