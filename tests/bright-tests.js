@@ -58,8 +58,8 @@ test('events', function() {
     ok(true, 'player1 triggered pause event');
     start();
   });
-  player.once('ended', function() {
-    ok(true, 'player1 triggered ended event');
+  player.once('end', function() {
+    ok(true, 'player1 triggered end event');
     start();
   });
 });
@@ -76,8 +76,8 @@ test('chaining', function() {
     player: testData.playerKey
   });
 
-  player.once('ended', function(player) {
-    ok(player, 'player1 triggered ended event');
+  player.once('end', function(player) {
+    ok(player, 'player1 triggered end event');
     start();
 
     player.once('load', function() {

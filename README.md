@@ -62,7 +62,7 @@ var player = Bright({
   // append other brightcove options here (optional)
 });
 
-player.on('ended', function(player) {
+player.on('end', function(player) {
   player.load(videoId);
 });
 ```
@@ -73,7 +73,7 @@ Currently supported __events__:
 - load
 - play
 - pause
-- ended
+- end
 
 These __event methods__ are copied from [maxhoffmann/emitter](https://github.com/maxhoffmann/emitter):
 - on(event, fn)

@@ -70,7 +70,7 @@ function Bright(options) {
 	  player.addEventListener(brightcoveEvent.CHANGE, trigger('load', bright));
 	  player.addEventListener(brightcoveEvent.PLAY, trigger('play', bright));
 	  player.addEventListener(brightcoveEvent.STOP, trigger('pause', bright));
-	  player.addEventListener(brightcoveEvent.COMPLETE, trigger('ended', bright));
+	  player.addEventListener(brightcoveEvent.COMPLETE, trigger('end', bright));
 	}
 
 	function trigger() {
