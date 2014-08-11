@@ -55,16 +55,18 @@ The brightcove player will be appended as a child to this element.
 
 ```js
 var player = Bright({
-  element: domElement,
-  video: videoId, // reference id ('ref:XXXXX') or video id (number)
-  player: playerKey // playerKey of the brightcove player
+  element: domElement, // [required] parent dom element of the video player
+  video: videoId,      // [required] reference id ('ref:XXXXX') or video id (number)
+  player: playerKey    // [required] playerKey of the brightcove player
+
+  // append other brightcove options here (optional)
 });
 
-player.on('ended', function(player) { // wait for end of video
+player.on('ended', function(player) {
   player.load(videoId);
 });
 
-player.init(); // init player
+player.init();
 ```
 
 Possible __options__ for brightcove can be found at [this page](http://support.brightcove.com/de/video-cloud/dokumente/player-konfigurationsparameter#supported) from the official documentation.
