@@ -8,7 +8,7 @@ This facade wraps the [brightcove smart player api](http://docs.brightcove.com/e
 Until the library is published on `npm` you can install it via the github url scheme.
 
 ```bash
-npm install edenspiekermann/bright --save
+npm install edenspiekermann-bright --save
 ```
 
 
