@@ -5,7 +5,7 @@
   "main": "dist/bright.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/edenspiekermann/brightcove-wrapper.git"
+    "url": "https://github.com/edenspiekermann/bright.git"
   },
   "directories": {
     "test": "tests"
@@ -24,6 +24,6 @@
   },
   "dependencies": {
     "lodash-node": "^2.4.1",
-    "maxhoffmann-emitter": "git://github.com/maxhoffmann/emitter"
+    "maxhoffmann-emitter": "^1.1.0"
   }
 }
