@@ -15,38 +15,29 @@
 <body>
   <div id="player"></div>
   <button id="load">load</button>
-  <button id="play">play</button>
-  <button id="pause">pause</button>
   <script src="//admin.brightcove.com/js/BrightcoveExperiences.js"></script>
   <script src="../dist/bright.js"></script>
   <script>
 
   var testData = {
-    brightcoveVideoId: 2470339735001,
-    brightcovePlayerKey: 'AQ~~,AAAB051hMkE~,GF6aXC8LXBNMR9-3c7Rsg36sl9a6CIqi'
+    video: 2470339735001,
+    player: 'AQ~~,AAAB051hMkE~,GF6aXC8LXBNMR9-3c7Rsg36sl9a6CIqi'
   };
 
-  var playerElement = document.getElementById('player');
-  var loadButtonElement = document.getElementById('load');
-  var playButtonElement = document.getElementById('play');
-  var pauseButtonElement = document.getElementById('pause');
+  var element = document.getElementById('player');
+  var loadButton = document.getElementById('load');
 
-  var options = { playerKey: testData.brightcovePlayerKey };
-  var player = Bright(playerElement, options);
-  player.on('ended', window.alert.bind(window));
+  var player = Bright({
+    element: element,
+    video: testData.video,
+    player: testData.player
+  });
   player.init();
 
-  loadButtonElement.onclick = function() {
-    player.load(testData.brightcoveVideoId);
-  };
-  playButtonElement.onclick = function() {
-    player.play();
-  };
-  pauseButtonElement.onclick = function() {
-    player.pause();
+  loadButton.onclick = function() {
+    player.load(testData.video);
   };
 
-  player.on('init', log('init'));
   player.on('load', log('load'));
   player.on('play', log('play'));
   player.on('pause', log('pause'));

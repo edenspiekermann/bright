@@ -21,13 +21,13 @@ _Common.js (webpack, browserify…)_
 var Bright = require('bright'); // installed via npm
 var Bright = require('./path_to/bright.js'); // use the one in the dist folder
 
-var player = Bright(domElement, options);
+var player = Bright(options);
 ```
 
 _Require.js_
 ```js
 require(['Bright'], function(Bright) {
-  var player = Bright(domElement, options);
+  var player = Bright(options);
 });
 ```
 
@@ -39,7 +39,7 @@ _Global Variable_
 ```
 ```js
 // main.js
-var player = Bright(domElement, options);
+var player = Bright(options);
 ```
 
 ___Note:___ `//admin.brightcove.com/js/BrightcoveExperiences.js` has to be loaded __before__ `bright.js`. Use your favorite script loader or simply add a `script` tag before your main js file.
@@ -54,26 +54,22 @@ Example HTML:
 The brightcove player will be appended as a child to this element.
 
 ```js
-var domElement = document.getElementById('player'); // or use jQuery etc. to get the element
-
-var player = Bright(domElement, options);
-
-player.on('init', function(player) { // wait for init of player
-  
-  player.load(videoId);
-  player.play();
-  player.play(videoId); // loads and plays video
-  player.pause();
-
+var player = Bright({
+  element: domElement,
+  video: videoId, // reference id ('ref:XXXXX') or video id (number)
+  player: playerKey // playerKey of the brightcove player
 });
 
-player.init(); // init player (also call this method if the player was hidden by CSS)
+player.on('ended', function(player) { // wait for end of video
+  player.load(videoId);
+});
+
+player.init(); // init player
 ```
 
 Possible __options__ for brightcove can be found at [this page](http://support.brightcove.com/de/video-cloud/dokumente/player-konfigurationsparameter#supported) from the official documentation.
 
 Currently supported __events__:
-- init
 - load
 - play
 - pause

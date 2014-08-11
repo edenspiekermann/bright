@@ -62,22 +62,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	var createObjectTag = __webpack_require__(2);
 
 	var uniqueId = 0;
-	var readyHandlers = {};
 	var loadHandlers = {};
-	var isPlayerReady = {};
+
 	var defaults = {
 		isVid: true, // required for all video players (totally nonsense by brightcove)
 		isUI: true,
-		includeAPI: true, // enable HTML5 "smart" player
+		includeAPI: true, // enable brightcove’s HTML5 "smart" player
 		wmode: 'transparent', // transparent backbround color for flash player
 		bgcolor: '#FFFFFF', // the players background color
 		showNoContentMessage: false, // hide error message if no video is loaded
-		templateLoadHandler: '__brightcoveTemplateHandlers.load',
-		templateReadyHandler: '__brightcoveTemplateHandlers.ready',
-		templateErrorHandler: '__brightcoveTemplateHandlers.error'
+		templateLoadHandler: 'brightcove.brightTemplateLoadHandler'
 	};
 
-	function Bright(element, options) {
+	function Bright(options) {
 
 		var emitter = Emitter();
 
@@ -86,27 +83,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var player;
 		var playerId = 'bright'+(uniqueId++);
 		loadHandlers[playerId] = loadHandler;
-		readyHandlers[playerId] = readyHandler;
 
 		var bright = Object.freeze({
+			init: init,
 			load: load,
-			play: play,
-			pause: pause,
 			on: emitter.on,
 			once: emitter.once,
 			off: emitter.off
 		});
 
-		function load(videoId) {
-			if (!videoId) throw new Error('missing video id');
+		function init() {
+			if (!options.element) throw new Error('(bright) missing element in options');
+			if (!options.player)  throw new Error('(bright) missing player (playerKey) in options');
+			if (!options.video)   throw new Error('(bright) missing video in options');
 
-			options["@videoPlayer"] = videoId;
+			options["@videoPlayer"] = options.video;
+			options.playerKey = options.player;
 
 			var object = createObjectTag(options);
 			object.id = playerId;
-			element.innerHTML = '';
+			options.element.innerHTML = '';
 
-			window.brightcove.createExperience(object, element, true);
+			window.brightcove.createExperience(object, options.element, true);
+		}
+
+		function load(video) {
+			options.video = video;
+			options["@videoPlayer"] = options.video;
+
+			if (typeof video === 'string') player.loadVideoByReferenceID(video);
+			if (typeof video === 'number') player.loadVideoByID(video);
 		}
 
 		function loadHandler() {
@@ -122,10 +128,6 @@ return /******/ (function(modules) { // webpackBootstrap
 		  player.addEventListener(brightcoveEvent.COMPLETE, trigger('ended', bright));
 		}
 
-		function readyHandler() {
-		  emitter.trigger('init', bright);
-		}
-
 		function trigger() {
 			var args = arguments;
 			return function() {
@@ -133,42 +135,11 @@ return /******/ (function(modules) { // webpackBootstrap
 			};
 		}
 
-		function play() {
-			player.play();
-		}
-
-		function pause() {
-			player.pause();
-		}
-
 		return bright;
 	}
 
-	if (typeof window.__brightcoveTemplateHandlers !== 'undefined') {
-		var message = 'global variable __brightcoveTemplateHandlers is already defined. ';
-			 message += 'Did you load "bright" more than once?';
-		throw new Error(message);
-	}
-
-	window.__brightcoveTemplateHandlers = {
-		load: function(playerId) {
-			isPlayerReady[playerId] = false;
-			loadHandlers[playerId]();
-		},
-		ready: function(event) {
-			var playerId = event.target.experience.id;
-			if (isPlayerReady[playerId]) return;
-			isPlayerReady[playerId] = true;
-			readyHandlers[playerId]();
-		},
-		error: function(event) {
-			var playerId = event.id;
-			if (isPlayerReady[playerId]) return;
-			if(playerId && event.code === 4) {
-				isPlayerReady[playerId] = true;
-				readyHandlers[playerId]();
-			}
-		}
+	window.brightcove.brightTemplateLoadHandler = function(playerId) {
+		loadHandlers[playerId]();
 	};
 
 	module.exports = Bright;
