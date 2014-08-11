@@ -65,8 +65,6 @@ var player = Bright({
 player.on('ended', function(player) {
   player.load(videoId);
 });
-
-player.init();
 ```
 
 Possible __options__ for brightcove can be found at [this page](http://support.brightcove.com/de/video-cloud/dokumente/player-konfigurationsparameter#supported) from the official documentation.
