@@ -32,9 +32,6 @@ test('init', function() {
     ok(true, 'load event for player2 has been fired');
     start();
   });
-
-  player1.init();
-  player2.init();
 });
 
 test('events', function() {
@@ -65,8 +62,6 @@ test('events', function() {
     ok(true, 'player1 triggered ended event');
     start();
   });
-
-  player.init();
 });
 
 test('chaining', function() {
@@ -91,8 +86,6 @@ test('chaining', function() {
     });
     player.load(testData.videoId);
   });
-
-  player.init();
 });
 
 test('hiding', function() {
@@ -107,8 +100,6 @@ test('hiding', function() {
     video: testData.videoId,
     player: testData.playerKey
   });
-
-  player.init();
 
   player.once('load', function() {
     ok(true, 'player inits');

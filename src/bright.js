@@ -29,12 +29,13 @@ function Bright(options) {
 	loadHandlers[playerId] = loadHandler;
 
 	var bright = Object.freeze({
-		init: init,
 		load: load,
 		on: emitter.on,
 		once: emitter.once,
 		off: emitter.off
 	});
+
+	init();
 
 	function init() {
 		if (!options.element) throw new Error('(bright) missing element in options');
