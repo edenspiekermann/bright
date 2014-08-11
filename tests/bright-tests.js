@@ -2,8 +2,8 @@
 /* jshint qunit:true */
 
 var testData = {
-  videoId: 2470339735001,
-  playerKey: 'AQ~~,AAAB051hMkE~,GF6aXC8LXBNMR9-3c7Rsg36sl9a6CIqi'
+  videoId: 1754276221001,
+  playerKey: 'AQ~~,AAABmA9XpXk~,-Kp7jNgisreaNI4gqZCnoD2NqdsPzOGP'
 };
 
 test('init', function() {
