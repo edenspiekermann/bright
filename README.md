@@ -93,3 +93,7 @@ Video and player id for testing are taken from [brightcove’s example page](htt
 5. `npm test` starts a local server & opens your default browser with `http://localhost:8000/tests`
 6. `npm run build` if all tests pass
 7. push to `develop`, merge into `master`
+
+## LICENSE
+
+MIT 2020 Edenspiekermann
